@@ -34,7 +34,7 @@ const isActive = (id: CityId) => computed(() => store.activeCityId === id);
         <h1
           class="font-epilogue font-black text-lg sm:text-2xl tracking-tight text-neon-pink text-neon-glow-primary truncate"
         >
-          KANSAI NEON
+          おおきに&nbsp;KOK！
         </h1>
       </div>
 
