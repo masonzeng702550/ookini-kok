@@ -226,8 +226,9 @@ onMounted(async () => {
     if (!map) return;
 
     // Base geography — load as inline data to avoid async fetch race that
-    // can leave layers blank until the first user interaction.
-    const baseUrl = new URL('/tiles/kansai-base.json', window.location.href).toString();
+    // can leave layers blank until the first user interaction. Use Vite's
+    // BASE_URL so the path resolves correctly under any GitHub Pages prefix.
+    const baseUrl = `${import.meta.env.BASE_URL}tiles/kansai-base.json`;
     const baseData = await fetch(baseUrl).then((r) => r.json());
     map.addSource('kansai-base', { type: 'geojson', data: baseData });
 

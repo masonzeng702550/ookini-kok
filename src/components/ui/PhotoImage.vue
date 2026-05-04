@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { assetPath } from '@/utils/asset';
 
 interface Props {
   src: string;
@@ -16,7 +17,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const loaded = ref(false);
 const errored = ref(false);
-const fallback = '/photos/_placeholder.svg';
+const fallback = assetPath('photos/_placeholder.svg');
+const resolvedSrc = computed(() => assetPath(props.src));
 </script>
 
 <template>
@@ -30,7 +32,7 @@ const fallback = '/photos/_placeholder.svg';
     ]"
   >
     <img
-      :src="errored ? fallback : props.src"
+      :src="errored ? fallback : resolvedSrc"
       :alt="props.alt"
       loading="lazy"
       decoding="async"
