@@ -1,0 +1,39 @@
+@import './tokens.css';
+@import './neon.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(58, 47, 36, 0.18);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 0, 122, 0.4);
+}
+
+/* MapLibre attribution — match paper theme */
+.maplibregl-ctrl-attrib {
+  background: rgba(255, 251, 240, 0.85) !important;
+  color: rgba(58, 47, 36, 0.7) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a { color: rgba(255, 0, 122, 0.85) !important; }
+.maplibregl-canvas { outline: none; }

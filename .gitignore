@@ -1,0 +1,24 @@
+# Build output / deps
+node_modules
+dist
+dist-ssr
+.vite
+coverage
+
+# OS / editor cruft
+.DS_Store
+*.local
+.env
+.env.local
+*.log
+.idea
+.vscode
+
+# Project tooling local files
+.claude
+
+# Design references and planning docs (not part of shippable site)
+PRD.md
+SPEC.md
+kansaimap.jpg
+stitch_kansai_neon_travel_map/

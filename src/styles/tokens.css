@@ -1,0 +1,51 @@
+:root {
+  /* Travel-map daytime palette ──────────────────────────────── */
+  --paper:       #faf3e3;   /* warm cream paper background */
+  --paper-soft:  #f4ebd4;   /* land fill */
+  --paper-warm:  #f0e3c4;   /* secondary surface */
+  --sea:         #b9dde6;   /* light dusty bay blue */
+  --sea-deep:    #a3cdd9;   /* outline / shadow */
+  --sea-glow:    #5fb6c8;   /* river / outline accent */
+  --sage:        #cbdcb5;   /* mountain soft green */
+  --sage-deep:   #a9c596;
+  --ink:         #3a2f24;   /* dark warm brown — primary text */
+  --ink-soft:    #6b5a47;   /* secondary text */
+  --ink-faint:   #a89683;
+  --line:        #d8c8a8;   /* subtle border */
+
+  /* Osaka brand accents (limited use: title, active states, logo) */
+  --neon-pink:    #ff007a;
+  --neon-pink-soft:#ffb1c3;
+  --neon-cyan:    #00b8d9;
+  --neon-green:   #6fbe3f;
+  --neon-orange:  #ff7a00;
+  --neon-yellow:  #ffd93d;   /* glico yellow */
+  --tako-red:     #d23a3a;
+
+  /* City theme colors (more saturated for travel-map vibrance) */
+  --city-osaka:   #e63946;   /* takoyaki red */
+  --city-kyoto:   #b7295a;   /* kimono purple-pink */
+  --city-kobe:    #2a7da3;   /* port blue */
+  --city-nara:    #6fbe3f;   /* deer-grass green */
+  --city-kix:     #ff7a00;   /* sunset orange */
+
+  /* Railway official colors (kept) */
+  --rail-jr-blue: #005fbf;
+  --rail-jr-loop: #ff4b12;
+  --rail-jr-nara: #a06700;
+  --rail-jr-haruka: #a03f8b;
+  --rail-hankyu: #7e2a36;
+  --rail-hanshin: #ffb300;
+  --rail-keihan: #0f8c40;
+  --rail-kintetsu: #c8102e;
+  --rail-nankai: #003f88;
+  --rail-nankai-airport: #0099d9;
+  --rail-nankai-koya: #a03f2f;
+  --rail-metro-midosuji: #e5171f;
+  --rail-metro-chuo: #009530;
+  --rail-shintetsu: #1a4da1;
+  --rail-sanyo: #a78a4d;
+  --rail-eizan: #94db00;
+  --rail-randen: #7db342;
+  --rail-monorail: #0091a1;
+}

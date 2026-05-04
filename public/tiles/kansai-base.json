@@ -1,0 +1,384 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "kind": "sea", "name": "Osaka Bay & Kii Channel" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [134.30, 34.10],
+          [134.30, 34.70],
+          [134.40, 34.65],
+          [134.55, 34.55],
+          [134.70, 34.50],
+          [134.80, 34.55],
+          [134.85, 34.65],
+          [134.95, 34.68],
+          [135.10, 34.69],
+          [135.18, 34.69],
+          [135.25, 34.685],
+          [135.35, 34.665],
+          [135.40, 34.640],
+          [135.43, 34.610],
+          [135.45, 34.580],
+          [135.45, 34.540],
+          [135.42, 34.500],
+          [135.38, 34.460],
+          [135.34, 34.420],
+          [135.30, 34.395],
+          [135.26, 34.360],
+          [135.22, 34.320],
+          [135.18, 34.260],
+          [135.15, 34.210],
+          [135.15, 34.180],
+          [135.10, 34.150],
+          [135.00, 34.130],
+          [134.85, 34.120],
+          [134.70, 34.110],
+          [134.55, 34.105],
+          [134.40, 34.100],
+          [134.30, 34.10]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "sea", "name": "Awaji Strait West" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [134.30, 34.70],
+          [134.30, 35.20],
+          [134.45, 35.10],
+          [134.55, 34.95],
+          [134.60, 34.80],
+          [134.55, 34.70],
+          [134.45, 34.65],
+          [134.30, 34.70]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "kix-island", "name": "Kansai Airport" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [135.222, 34.418],
+          [135.222, 34.450],
+          [135.262, 34.450],
+          [135.262, 34.418],
+          [135.222, 34.418]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "river", "name": "Yodogawa" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.430, 34.690],
+          [135.480, 34.700],
+          [135.520, 34.708],
+          [135.540, 34.715],
+          [135.580, 34.730],
+          [135.620, 34.755],
+          [135.660, 34.795],
+          [135.690, 34.840],
+          [135.720, 34.890],
+          [135.745, 34.950]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "river", "name": "Yamato-gawa" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.450, 34.625],
+          [135.520, 34.605],
+          [135.620, 34.598],
+          [135.700, 34.605],
+          [135.760, 34.620]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "mountains", "name": "Rokko" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [135.170, 34.730],
+          [135.190, 34.760],
+          [135.230, 34.795],
+          [135.290, 34.815],
+          [135.340, 34.800],
+          [135.330, 34.770],
+          [135.290, 34.745],
+          [135.230, 34.728],
+          [135.190, 34.722],
+          [135.170, 34.730]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "mountains", "name": "Ikoma" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [135.665, 34.620],
+          [135.670, 34.700],
+          [135.690, 34.760],
+          [135.720, 34.770],
+          [135.730, 34.700],
+          [135.720, 34.640],
+          [135.700, 34.615],
+          [135.665, 34.620]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "mountains", "name": "Kongo-Katsuragi" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [135.640, 34.430],
+          [135.660, 34.500],
+          [135.690, 34.560],
+          [135.720, 34.555],
+          [135.720, 34.480],
+          [135.690, 34.420],
+          [135.660, 34.410],
+          [135.640, 34.430]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "mountains", "name": "Kitayama-Kurama" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [135.640, 35.080],
+          [135.680, 35.180],
+          [135.760, 35.220],
+          [135.840, 35.180],
+          [135.830, 35.110],
+          [135.760, 35.060],
+          [135.700, 35.060],
+          [135.640, 35.080]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "mountains", "name": "Kii Range" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [135.500, 34.220],
+          [135.580, 34.300],
+          [135.700, 34.350],
+          [135.820, 34.380],
+          [135.900, 34.330],
+          [135.880, 34.260],
+          [135.800, 34.220],
+          [135.700, 34.200],
+          [135.600, 34.205],
+          [135.500, 34.220]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "mountains", "name": "Tamba" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [135.000, 35.000],
+          [135.100, 35.100],
+          [135.250, 35.150],
+          [135.350, 35.080],
+          [135.300, 34.950],
+          [135.200, 34.900],
+          [135.080, 34.920],
+          [135.000, 35.000]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-border", "name": "Hyogo / Osaka" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.395, 34.700],
+          [135.395, 34.770],
+          [135.380, 34.830],
+          [135.360, 34.880],
+          [135.355, 34.945]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-border", "name": "Osaka / Kyoto" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.355, 34.945],
+          [135.450, 34.940],
+          [135.560, 34.945],
+          [135.640, 34.940],
+          [135.700, 34.930],
+          [135.755, 34.910]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-border", "name": "Osaka / Nara (Ikoma)" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.755, 34.910],
+          [135.720, 34.870],
+          [135.690, 34.800],
+          [135.680, 34.700],
+          [135.685, 34.620],
+          [135.680, 34.520],
+          [135.660, 34.420]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-border", "name": "Osaka / Wakayama" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.660, 34.420],
+          [135.580, 34.380],
+          [135.490, 34.350],
+          [135.380, 34.330],
+          [135.260, 34.330]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-border", "name": "Nara / Wakayama" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.660, 34.420],
+          [135.700, 34.350],
+          [135.760, 34.290],
+          [135.820, 34.230],
+          [135.870, 34.180]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-border", "name": "Nara / Kyoto" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.755, 34.910],
+          [135.790, 34.900],
+          [135.860, 34.880],
+          [135.920, 34.860]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-border", "name": "Kyoto / Shiga" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.920, 34.860],
+          [135.950, 34.940],
+          [135.960, 35.020],
+          [135.970, 35.130],
+          [135.980, 35.260]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-border", "name": "Hyogo / Kyoto (north)" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [135.355, 34.945],
+          [135.310, 35.050],
+          [135.280, 35.180],
+          [135.260, 35.290],
+          [135.260, 35.420]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-label", "name": "京都府", "rome": "KYOTO PREF." },
+      "geometry": { "type": "Point", "coordinates": [135.620, 35.230] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-label", "name": "兵庫縣", "rome": "HYOGO PREF." },
+      "geometry": { "type": "Point", "coordinates": [134.720, 35.000] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-label", "name": "大阪府", "rome": "OSAKA PREF." },
+      "geometry": { "type": "Point", "coordinates": [135.520, 34.560] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-label", "name": "奈良縣", "rome": "NARA PREF." },
+      "geometry": { "type": "Point", "coordinates": [135.870, 34.500] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-label", "name": "和歌山縣", "rome": "WAKAYAMA PREF." },
+      "geometry": { "type": "Point", "coordinates": [135.380, 34.180] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "pref-label", "name": "滋賀縣", "rome": "SHIGA PREF." },
+      "geometry": { "type": "Point", "coordinates": [136.180, 35.150] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "kind": "awaji-island", "name": "Awaji" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [134.700, 34.500],
+          [134.730, 34.580],
+          [134.780, 34.620],
+          [134.810, 34.610],
+          [134.830, 34.560],
+          [134.840, 34.500],
+          [134.830, 34.420],
+          [134.800, 34.350],
+          [134.770, 34.290],
+          [134.730, 34.230],
+          [134.700, 34.200],
+          [134.670, 34.220],
+          [134.660, 34.300],
+          [134.680, 34.400],
+          [134.700, 34.500]
+        ]]
+      }
+    }
+  ]
+}
