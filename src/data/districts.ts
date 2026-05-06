@@ -194,6 +194,19 @@ export const DISTRICTS: District[] = [
     ],
     labelCoord: [135.247, 34.798],
   },
+  {
+    id: 'kobe-suma-maiko',
+    cityId: 'kobe',
+    name_zh: '須磨/垂水',
+    description: '須磨海濱、明石海峽大橋、舞子海上玻璃步道',
+    bounds: [
+      [135.020, 34.620],
+      [135.150, 34.620],
+      [135.150, 34.660],
+      [135.020, 34.660],
+    ],
+    labelCoord: [135.085, 34.640],
+  },
 
   // ─── NARA ──────────────────────────────────────────────────────────────
   {
@@ -248,12 +261,25 @@ export const DISTRICTS: District[] = [
     ],
     labelCoord: [135.733, 34.614],
   },
+  {
+    id: 'nara-yoshino',
+    cityId: 'nara',
+    name_zh: '吉野/櫻井（遠郊）',
+    description: '長谷寺、吉野山一目千本櫻',
+    bounds: [
+      [135.840, 34.340],
+      [135.940, 34.340],
+      [135.940, 34.560],
+      [135.840, 34.560],
+    ],
+    labelCoord: [135.890, 34.450],
+  },
 
   // ─── KIX & 泉州 ───────────────────────────────────────────────────────
   {
     id: 'kix-rinku',
     cityId: 'kix',
-    name_zh: '臨空鎮',
+    name_zh: '臨空城',
     description: 'Rinku Outlets、臨空公園、大理石海灘',
     bounds: [
       [135.290, 34.400],
