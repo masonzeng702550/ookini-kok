@@ -301,7 +301,7 @@ export const STATIONS: MapStation[] = [
   // ─── KIX area / South ─────────────────────────────────────────────
   {
     id: 'rinku-stn',
-    name_zh: '臨空鎮',
+    name_zh: '臨空城',
     name_jp: 'りんくうタウン',
     coord: [135.2960, 34.4080],
     kind: 'hub',

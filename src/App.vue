@@ -5,6 +5,7 @@ import SideDrawer from '@/components/layout/SideDrawer.vue';
 import KansaiMap from '@/components/map/KansaiMap.vue';
 import { useMapStore } from '@/stores/map';
 import { useBreakpoint } from '@/composables/useBreakpoint';
+import { playKixChime } from '@/audio/chime';
 import type { CityId } from '@/types';
 
 const store = useMapStore();
@@ -12,6 +13,7 @@ const { isMobile, isDesktop } = useBreakpoint();
 
 function selectCity(id: CityId) {
   store.selectCity(id);
+  if (id === 'kix') playKixChime();
 }
 
 onMounted(() => {

@@ -2,9 +2,16 @@
 import { computed } from 'vue';
 import { useMapStore } from '@/stores/map';
 import { RAILWAYS } from '@/data/railways';
+import { playMidosujiChime } from '@/audio/chime';
 
 const store = useMapStore();
 const railway = computed(() => store.activeRailway);
+
+function selectRailway(id: string) {
+  store.selectRailway(id);
+  // All Osaka Metro lines share the same e.piano chime (Midosuji-style)
+  if (id.startsWith('osaka-metro-')) playMidosujiChime();
+}
 </script>
 
 <template>
@@ -90,7 +97,7 @@ const railway = computed(() => store.activeRailway);
         v-for="r in RAILWAYS"
         :key="r.id"
         class="flex items-center gap-3 p-2.5 rounded-lg border border-line bg-paper-soft hover:bg-paper-warm hover:border-neon-pink/40 transition text-left"
-        @click="store.selectRailway(r.id)"
+        @click="selectRailway(r.id)"
       >
         <span
           class="w-2.5 h-8 rounded-sm"

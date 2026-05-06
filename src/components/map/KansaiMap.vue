@@ -8,6 +8,7 @@ import { DISTRICTS } from '@/data/districts';
 import { ATTRACTIONS } from '@/data/attractions';
 import { STATIONS } from '@/data/stations';
 import { railwaysToGeoJSON, districtsToGeoJSON } from '@/data/geo';
+import { playKixChime, playMidosujiChime } from '@/audio/chime';
 import type { MapStation } from '@/types';
 import { useMapStore } from '@/stores/map';
 import CityMarker from './CityMarker.vue';
@@ -24,9 +25,11 @@ let stationMarkers: Marker[] = [];
 let resizeObserver: ResizeObserver | null = null;
 
 // Kansai bounds
-const KANSAI_CENTER: [number, number] = [135.5, 34.75];
+const KANSAI_CENTER: [number, number] = [135.6, 34.75];
+// West edge clipped at Akashi (~134.9) so the viewport opens at Akashi-Awaji
+// rather than empty Seto Inland Sea
 const KANSAI_BOUNDS: [[number, number], [number, number]] = [
-  [134.4, 34.0],
+  [134.9, 34.0],
   [136.3, 35.35],
 ];
 
@@ -86,6 +89,7 @@ function makeCityMarkerEl(city: City): HTMLElement {
     active: store.activeCityId === city.id,
     onClick: (c: City) => {
       store.selectCity(c.id);
+      if (c.id === 'kix') playKixChime();
       map?.flyTo({ center: c.coord, zoom: 11, speed: 0.9 });
     },
   });
@@ -310,14 +314,40 @@ onMounted(async () => {
       },
     });
     map.addLayer({
-      id: 'kix-island',
+      id: 'harbor-island',
       type: 'fill',
       source: 'kansai-base',
-      filter: ['==', ['get', 'kind'], 'kix-island'],
+      filter: ['==', ['get', 'kind'], 'harbor-island'],
       paint: {
         'fill-color': '#f4ebd4',
         'fill-outline-color': '#a3cdd9',
       },
+    });
+    map.addLayer({
+      id: 'harbor-island-edge',
+      type: 'line',
+      source: 'kansai-base',
+      filter: ['==', ['get', 'kind'], 'harbor-island'],
+      paint: {
+        'line-color': '#3a8da3',
+        'line-width': 1,
+        'line-opacity': 0.85,
+      },
+    });
+
+    // Ferry route between KIX and Kobe Airport (dashed line over the bay)
+    map.addLayer({
+      id: 'ferry-route',
+      type: 'line',
+      source: 'kansai-base',
+      filter: ['==', ['get', 'kind'], 'ferry-route'],
+      paint: {
+        'line-color': '#3a8da3',
+        'line-width': 1.6,
+        'line-dasharray': [2, 2.5],
+        'line-opacity': 0.85,
+      },
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
     });
 
     // Prefecture (府縣) borders — soft dashed line, recessive
@@ -383,6 +413,8 @@ onMounted(async () => {
       if (!f) return;
       const id = (f.properties as { id: string }).id;
       store.selectRailway(id);
+      // All Osaka Metro lines share the e.piano chime
+      if (id.startsWith('osaka-metro-')) playMidosujiChime();
     });
     // Click district (only when visible)
     map.on('click', 'district-fill', (e) => {
