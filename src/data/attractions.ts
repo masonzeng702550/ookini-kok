@@ -302,6 +302,19 @@ export const ATTRACTIONS: Attraction[] = [
     photo: PLACEHOLDER,
     tags: ['family'],
   },
+  {
+    id: 'expo2025',
+    districtId: 'osaka-bay',
+    cityId: 'osaka',
+    name_zh: '2025 大阪・關西萬博',
+    name_jp: '2025 大阪・関西万博',
+    coord: [135.395, 34.658],
+    shortDesc: '夢洲萬博會場，大屋根「リング」與各國館',
+    iconSymbol: 'public',
+    photo: PLACEHOLDER,
+    tags: ['top-rated', 'family'],
+    nearestStation: '夢洲（大阪Metro中央線）',
+  },
 
   // ─── OSAKA 天王寺 ─────────────────────────────────────────────────
   {
@@ -1017,6 +1030,62 @@ export const ATTRACTIONS: Attraction[] = [
     shortDesc: '鑑真和尚所建，唐代建築風格',
     iconSymbol: 'temple_buddhist',
     photo: PLACEHOLDER,
+  },
+
+  // ─── KOBE 港 增補 ─────────────────────────────────────────────────
+  {
+    id: 'kobe-airport-attr',
+    districtId: 'kobe-harbor',
+    cityId: 'kobe',
+    name_zh: '神戶機場',
+    name_jp: '神戸空港',
+    coord: [135.226, 34.633],
+    shortDesc: '人工島上的市內機場，可搭 Port Liner 直達',
+    iconSymbol: 'flight',
+    photo: PLACEHOLDER,
+    tags: ['family'],
+    nearestStation: '神戶空港',
+  },
+
+  // ─── OSAKA 北大阪 (新區) ──────────────────────────────────────────
+  {
+    id: 'expo-park',
+    districtId: 'osaka-kita',
+    cityId: 'osaka',
+    name_zh: '萬博紀念公園',
+    name_jp: '万博記念公園',
+    coord: [135.5350, 34.8045],
+    shortDesc: '1970 萬博跡地、太陽之塔象徵地標',
+    iconSymbol: 'park',
+    photo: PLACEHOLDER,
+    tags: ['top-rated', 'family'],
+    nearestStation: '万博記念公園（大阪單軌）',
+  },
+  {
+    id: 'cupnoodle-ikeda',
+    districtId: 'osaka-kita',
+    cityId: 'osaka',
+    name_zh: '池田泡麵發明紀念館',
+    name_jp: 'カップヌードルミュージアム池田',
+    coord: [135.4324, 34.8235],
+    shortDesc: '安藤百福發明處，動手做專屬泡麵',
+    iconSymbol: 'restaurant',
+    photo: PLACEHOLDER,
+    tags: ['family'],
+    nearestStation: '池田（阪急寶塚線）',
+  },
+  {
+    id: 'itami-airport',
+    districtId: 'osaka-kita',
+    cityId: 'osaka',
+    name_zh: '大阪國際機場（伊丹）',
+    name_jp: '大阪国際空港',
+    coord: [135.4380, 34.7853],
+    shortDesc: '國內線主要機場，展望台可觀飛機起降',
+    iconSymbol: 'flight',
+    photo: PLACEHOLDER,
+    tags: ['family'],
+    nearestStation: '大阪空港（大阪單軌）',
   },
 
   // ─── NARA 吉野/櫻井 (新區) ────────────────────────────────────────
