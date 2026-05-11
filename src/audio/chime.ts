@@ -206,6 +206,27 @@ export function playKixChime(): void {
   );
 }
 
+// ─── 伊丹空港 chime: G4 – B4 – G4 – D5 – G5 〔rest〕 D6 – D6 ──────
+// Reverse-engineered from the official Itami Airport boarding chime via
+// onset detection + harmonic analysis. G-major ascending arpeggio resolving
+// on a held high D6 — same sine-bell voicing as the KIX chime.
+export function playItamiChime(): void {
+  // Onset start times (seconds) lifted from the FFT analysis
+  const notes: { f: number; at: number }[] = [
+    { f: 392.0, at: 0.0 }, // G4
+    { f: 493.88, at: 0.33 }, // B4
+    { f: 392.0, at: 0.6 }, // G4
+    { f: 587.33, at: 0.9 }, // D5
+    { f: 783.99, at: 1.18 }, // G5
+    { f: 1174.66, at: 1.67 }, // D6 (after pause)
+    { f: 1174.66, at: 2.04 }, // D6 (held)
+  ];
+  playSequence(
+    notes.map(({ f, at }) => ({ f, at, dur: 0.95 })),
+    0.95,
+  );
+}
+
 // ─── 御堂筋線 (Midosuji Line) approach melodies ─────────────────────
 // Two patterns; one picked at random per click for variety.
 
