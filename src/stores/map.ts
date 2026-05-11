@@ -3,6 +3,7 @@ import { CITIES, CITY_BY_ID } from '@/data/cities';
 import { DISTRICTS, DISTRICT_BY_ID } from '@/data/districts';
 import { ATTRACTIONS } from '@/data/attractions';
 import { RAILWAY_BY_ID } from '@/data/railways';
+import { STATIONS } from '@/data/stations';
 import type { CityId, DrawerTab, ZoomLevel } from '@/types';
 
 interface State {
@@ -11,6 +12,7 @@ interface State {
   activeDistrictId: string | null;
   activeRailwayId: string | null;
   activeAttractionId: string | null;
+  activeStationId: string | null;
   zoomLevel: ZoomLevel;
   drawerOpen: boolean;
 }
@@ -22,6 +24,7 @@ export const useMapStore = defineStore('map', {
     activeDistrictId: null,
     activeRailwayId: null,
     activeAttractionId: null,
+    activeStationId: null,
     zoomLevel: 'overview',
     drawerOpen: true,
   }),
@@ -34,6 +37,8 @@ export const useMapStore = defineStore('map', {
       s.activeRailwayId ? RAILWAY_BY_ID[s.activeRailwayId] : null,
     activeAttraction: (s) =>
       ATTRACTIONS.find((a) => a.id === s.activeAttractionId) ?? null,
+    activeStation: (s) =>
+      STATIONS.find((st) => st.id === s.activeStationId) ?? null,
 
     activeCityAttractions: (s) =>
       s.activeCityId ? ATTRACTIONS.filter((a) => a.cityId === s.activeCityId) : [],
@@ -66,12 +71,22 @@ export const useMapStore = defineStore('map', {
       this.activeRailwayId = id;
       this.activeDistrictId = null;
       this.activeAttractionId = null;
+      this.activeStationId = null;
       this.activeTab = 'railways';
       this.drawerOpen = true;
     },
     selectAttraction(id: string) {
       this.activeAttractionId = id;
       this.activeTab = 'attractions';
+      this.drawerOpen = true;
+    },
+    selectStation(id: string) {
+      // Clicking a station shows transfer-line info, not area info.
+      this.activeStationId = id;
+      this.activeRailwayId = null;
+      this.activeDistrictId = null;
+      this.activeAttractionId = null;
+      this.activeTab = 'railways';
       this.drawerOpen = true;
     },
     setTab(tab: DrawerTab) {
@@ -87,6 +102,7 @@ export const useMapStore = defineStore('map', {
       this.activeDistrictId = null;
       this.activeRailwayId = null;
       this.activeAttractionId = null;
+      this.activeStationId = null;
     },
   },
 });

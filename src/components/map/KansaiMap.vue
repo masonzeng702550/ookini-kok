@@ -8,7 +8,7 @@ import { DISTRICTS } from '@/data/districts';
 import { ATTRACTIONS } from '@/data/attractions';
 import { STATIONS } from '@/data/stations';
 import { railwaysToGeoJSON, districtsToGeoJSON } from '@/data/geo';
-import { playKixChime, playMidosujiChime } from '@/audio/chime';
+import { playKixChime, playMidosujiChime, playItamiChime } from '@/audio/chime';
 import type { MapStation } from '@/types';
 import { useMapStore } from '@/stores/map';
 import CityMarker from './CityMarker.vue';
@@ -137,6 +137,16 @@ function makeStationEl(s: MapStation): HTMLElement {
       ">${s.name_zh}</div>
     </div>`;
   wrap.title = `${s.name_zh}\n${s.lines.join(' / ')}`;
+  wrap.style.cursor = 'pointer';
+  wrap.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    store.selectStation(s.id);
+    map?.flyTo({
+      center: s.coord,
+      zoom: Math.max(map.getZoom(), 12.5),
+      speed: 0.9,
+    });
+  });
   return wrap;
 }
 
@@ -478,6 +488,8 @@ onMounted(async () => {
       el.addEventListener('click', (ev) => {
         ev.stopPropagation();
         store.selectAttraction(a.id);
+        if (a.id === 'itami-airport') playItamiChime();
+        if (a.id === 'kobe-airport-attr') playKixChime();
         map?.flyTo({ center: a.coord, zoom: Math.max(map.getZoom(), 12.5), speed: 0.9 });
       });
       const m = new maplibregl.Marker({ element: el, anchor: 'center' })

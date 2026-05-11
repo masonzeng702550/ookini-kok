@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useMapStore } from '@/stores/map';
 import { DISTRICTS } from '@/data/districts';
+import { playItamiChime, playKixChime } from '@/audio/chime';
 import AttractionCard from './AttractionCard.vue';
 
 const store = useMapStore();
@@ -18,6 +19,9 @@ const grouped = computed(() => {
 
 function selectAttraction(id: string) {
   store.selectAttraction(id);
+  if (id === 'itami-airport') playItamiChime();
+  // 神戶機場 borrows the KIX 4-note chime
+  if (id === 'kobe-airport-attr') playKixChime();
 }
 </script>
 
