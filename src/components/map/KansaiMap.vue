@@ -33,6 +33,24 @@ const KANSAI_BOUNDS: [[number, number], [number, number]] = [
   [136.3, 35.35],
 ];
 
+/**
+ * Decide the minimum zoom at which a station marker becomes visible.
+ * More lines crossing a station ⇒ visible from farther out.
+ *   - 5+ lines (e.g. 大阪/梅田, 三宮): visible from zoom ≥ 9
+ *   - 4 lines: ≥ 10
+ *   - 3 lines: ≥ 11
+ *   - 2 lines: ≥ 11.5
+ *   - 1 line (most termini):  ≥ 12
+ */
+function stationMinZoom(s: MapStation): number {
+  const n = s.lines.length;
+  if (n >= 5) return 9;
+  if (n === 4) return 10;
+  if (n === 3) return 11;
+  if (n === 2) return 11.5;
+  return 12;
+}
+
 function setVisibilityForZoom(z: number) {
   const level = z <= 9 ? 'overview' : z <= 11.2 ? 'district' : 'detail';
   store.setZoomLevel(level);
@@ -60,14 +78,16 @@ function setVisibilityForZoom(z: number) {
     const el = m.getElement();
     el.style.display = level === 'overview' ? '' : 'none';
   });
-  // Stations: hide on overview (too cluttered), show district + detail
+  // Stations: each marker has its own zoom threshold based on transfer
+  // importance — mega-hubs visible from afar, single-line termini only
+  // once the user is zoomed in close.
   stationMarkers.forEach((m) => {
     const el = m.getElement();
-    el.style.display = level === 'overview' ? 'none' : '';
-    // Slightly bigger labels at detail zoom
+    const minZ = parseFloat(el.dataset.minZoom ?? '12');
+    el.style.display = z >= minZ ? '' : 'none';
     const label = el.querySelector<HTMLElement>('.station-label');
     if (label) {
-      label.style.fontSize = level === 'detail' ? '11px' : '10px';
+      label.style.fontSize = z >= 12.5 ? '11px' : '10px';
     }
   });
   // City markers shrink slightly at detail so they don't dominate
@@ -138,6 +158,7 @@ function makeStationEl(s: MapStation): HTMLElement {
     </div>`;
   wrap.title = `${s.name_zh}\n${s.lines.join(' / ')}`;
   wrap.style.cursor = 'pointer';
+  wrap.dataset.minZoom = String(stationMinZoom(s));
   wrap.addEventListener('click', (ev) => {
     ev.stopPropagation();
     store.selectStation(s.id);
