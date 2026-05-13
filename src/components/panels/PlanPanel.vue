@@ -6,6 +6,7 @@ import { CITIES } from '@/data/cities';
 import { planItinerary, recommendItinerary } from '@/data/planner';
 import { RAILWAY_BY_ID } from '@/data/railways';
 import PlanPrefsCard from './PlanPrefsCard.vue';
+import PlanSurpriseButton from './PlanSurpriseButton.vue';
 import type { CityId, CommuteSegment, PlannerPrefs } from '@/types';
 
 const store = useMapStore();
@@ -148,6 +149,8 @@ const itinerary = computed(() => store.itinerary);
       <span class="material-symbols-outlined filled align-middle text-[18px] mr-1">auto_awesome</span>
       自動推薦行程
     </button>
+
+    <PlanSurpriseButton :day-count="dayCount" />
 
     <!-- Manual select -->
     <details class="border border-line rounded-lg bg-paper-soft" open>
