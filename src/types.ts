@@ -87,6 +87,30 @@ export interface Railway {
 export type ZoomLevel = 'overview' | 'district' | 'detail';
 export type DrawerTab = 'area' | 'attractions' | 'railways' | 'food' | 'favorites';
 
+export type CommuteMode = 'walk' | 'train' | 'transfer';
+
+export interface CommuteSegment {
+  mode: CommuteMode;
+  /** Minutes for this segment. */
+  minutes: number;
+  /** Distance in meters (only meaningful for walk segments). */
+  meters?: number;
+  /** Railway id when mode === 'train', undefined otherwise. */
+  railwayId?: string;
+  /** Display label, e.g. "JR京都線" or "步行 6 分鐘". */
+  label: string;
+  fromStation?: string;
+  toStation?: string;
+}
+
+export interface CommutePlan {
+  totalMinutes: number;
+  segments: CommuteSegment[];
+  /** Full coordinate polyline from origin attraction to destination attraction,
+   *  with railway curves sliced from the corresponding line geometry. */
+  path: LngLat[];
+}
+
 export type StationKind = 'hub' | 'terminus';
 
 export interface MapStation {
