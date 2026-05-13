@@ -1,0 +1,119 @@
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 18mm;
+  }
+
+  /* Hide everything by default, then opt in only the print root. */
+  body > * {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .print-itinerary-root,
+  .print-itinerary-root * {
+    display: revert !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    color: #000000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    animation: none !important;
+    transition: none !important;
+    border-style: solid !important;
+  }
+
+  .print-itinerary-root {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    left: 0 !important;
+    top: 0 !important;
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+
+  .print-itinerary-root .print-header {
+    border-bottom: 1.5pt solid #000;
+    padding-bottom: 6pt;
+    margin-bottom: 10pt;
+  }
+
+  .print-itinerary-root .print-header-title {
+    font-size: 16pt;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  .print-itinerary-root .print-header-sub {
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-top: 2pt;
+  }
+
+  .print-itinerary-root .print-day {
+    border: 1pt solid #000;
+    padding: 8pt 10pt;
+    margin-bottom: 10pt;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .print-itinerary-root .print-day-title {
+    font-size: 13pt;
+    font-weight: 800;
+    margin-bottom: 2pt;
+  }
+
+  .print-itinerary-root .print-day-meta {
+    font-size: 9pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6pt;
+  }
+
+  .print-itinerary-root .print-stop {
+    border-left: 2pt solid #000;
+    padding: 3pt 0 3pt 8pt;
+    margin: 3pt 0;
+    list-style: none;
+  }
+
+  .print-itinerary-root .print-stop-name {
+    font-weight: 700;
+    font-size: 11pt;
+  }
+
+  .print-itinerary-root .print-stop-meta {
+    font-size: 9pt;
+    margin-top: 1pt;
+  }
+
+  .print-itinerary-root .print-commute {
+    font-size: 9pt;
+    margin: 2pt 0 2pt 10pt;
+    padding-left: 6pt;
+    border-left: 0.5pt solid #000;
+  }
+
+  .print-itinerary-root .print-empty {
+    font-size: 10pt;
+    font-style: italic;
+  }
+
+  .print-itinerary-root ol,
+  .print-itinerary-root ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
