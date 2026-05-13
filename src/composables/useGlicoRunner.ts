@@ -101,7 +101,11 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
   let marker: maplibregl.Marker | null = null;
   let el: HTMLDivElement | null = null;
   let innerEl: HTMLDivElement | null = null;
-  let rafId: number | null = null;
+  // setInterval (rather than rAF) so the runner keeps moving even in
+  // headless/background contexts where browsers pause animation frames.
+  // 33 ms ≈ 30 fps — plenty smooth for a mascot icon.
+  const TICK_MS = 33;
+  let intervalId: number | null = null;
   let lastTs: number | null = null;
   let segIndex = 0;
   let segProgressKm = 0;
@@ -155,8 +159,8 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
     innerEl.style.transform = `scaleX(${sx}) rotate(${rotationDeg}deg)`;
   }
 
-  function step(ts: number) {
-    rafId = null;
+  function step() {
+    const ts = performance.now();
     if (!opts.playing.value) {
       lastTs = null;
       return;
@@ -222,21 +226,19 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
     // Clamp to a gentle tilt for up/down legs so the runner doesn't somersault.
     const tilt = Math.max(-25, Math.min(25, angle));
     applyTransform(tilt, flipX);
-
-    rafId = requestAnimationFrame(step);
   }
 
   function startLoop() {
-    if (rafId != null) return;
+    if (intervalId != null) return;
     if (!opts.playing.value) return;
     if (activeCoords.length < 2) return;
     lastTs = null;
-    rafId = requestAnimationFrame(step);
+    intervalId = window.setInterval(step, TICK_MS);
   }
 
   function stopLoop() {
-    if (rafId != null) cancelAnimationFrame(rafId);
-    rafId = null;
+    if (intervalId != null) window.clearInterval(intervalId);
+    intervalId = null;
     lastTs = null;
   }
 
