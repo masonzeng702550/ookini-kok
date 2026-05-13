@@ -19,6 +19,8 @@ import type { City } from '@/types';
 
 const store = useMapStore();
 const containerRef = ref<HTMLElement | null>(null);
+// Reactive map handle so composables can react to map availability.
+const mapRef = ref<MlMap | null>(null);
 let map: MlMap | null = null;
 let cityMarkers: Marker[] = [];
 let attractionMarkers: Marker[] = [];
@@ -325,6 +327,7 @@ onMounted(async () => {
   if (import.meta.env.DEV) {
     (window as unknown as { __map: MlMap }).__map = map;
   }
+  mapRef.value = map;
 
   map.on('load', async () => {
     if (!map) return;
@@ -673,6 +676,7 @@ onBeforeUnmount(() => {
   stationMarkers.forEach((m) => m.remove());
   map?.remove();
   map = null;
+  mapRef.value = null;
 });
 
 // React to active city changes from outside (e.g. TopAppBar)
