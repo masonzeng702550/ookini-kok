@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, computed, watch, h, render, type VNode } from 'vue';
+import { onMounted, onBeforeUnmount, ref, shallowRef, computed, watch, h, render, type VNode } from 'vue';
 import maplibregl, { Map as MlMap, Marker } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { NEON_DARK_STYLE } from './style';
@@ -21,7 +21,9 @@ import type { City, LngLat } from '@/types';
 const store = useMapStore();
 const containerRef = ref<HTMLElement | null>(null);
 // Reactive map handle so composables can react to map availability.
-const mapRef = ref<MlMap | null>(null);
+// shallowRef avoids vue-tsc structurally expanding the MapLibre Map class
+// (which would otherwise break nominal type compatibility with consumers).
+const mapRef = shallowRef<MlMap | null>(null);
 let map: MlMap | null = null;
 
 // Glico runner: chase the first day's full commute path while a plan is active.

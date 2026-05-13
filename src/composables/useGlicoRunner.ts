@@ -1,9 +1,11 @@
-import { watch, onScopeDispose, type Ref } from 'vue';
-import maplibregl from 'maplibre-gl';
+import { watch, onScopeDispose, type ShallowRef, type Ref } from 'vue';
+import maplibregl, { Map as MlMap } from 'maplibre-gl';
 import type { LngLat } from '@/types';
 
 interface GlicoRunnerOptions {
-  map: Ref<maplibregl.Map | null>;
+  // ShallowRef so vue-tsc keeps the Map type nominal rather than expanding
+  // it structurally through ref()'s deep unwrap.
+  map: ShallowRef<MlMap | null>;
   coords: Ref<LngLat[] | null>;
   speedKmh?: number;
   loop?: boolean;
