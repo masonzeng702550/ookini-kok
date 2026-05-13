@@ -38,6 +38,8 @@ export interface Attraction {
   photo: PhotoMeta;
   tags?: AttractionTag[];
   nearestStation?: string;
+  /** Typical visit duration in minutes. Auto-filled from DURATIONS map. */
+  duration: number;
 }
 
 export interface PhotoMeta {

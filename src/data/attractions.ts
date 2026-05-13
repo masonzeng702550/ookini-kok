@@ -1,5 +1,128 @@
 import type { Attraction } from '@/types';
 
+// Typical visit duration in minutes per attraction. Tuned by category:
+//   - Big theme parks / expos:    300-480
+//   - Major castles/temples:      75-120
+//   - Smaller temples/shrines:    30-60
+//   - Streets/markets/districts:  45-75
+//   - Viewpoints/single sights:   20-45
+//   - Onsen / nature half-day:    150-240
+//   - Airports (transit only):    0  (planner skips)
+const DURATIONS: Record<string, number> = {
+  // KYOTO 東山
+  'kiyomizu-dera': 75,
+  'gion': 60,
+  'yasaka-jinja': 30,
+  'kodaiji': 45,
+  'nanzenji': 60,
+  'ginkakuji': 60,
+  'philosophers-path': 45,
+  'eikando': 60,
+  'kenninji': 45,
+  // KYOTO 嵐山
+  'arashiyama-bamboo': 30,
+  'togetsukyo': 20,
+  'tenryuji': 60,
+  'okochi-sanso': 45,
+  'gioji': 30,
+  'hozugawa-kudari': 120,
+  // KYOTO 洛北
+  'kinkakuji': 60,
+  'ryoanji': 45,
+  'kifune-jinja': 60,
+  'kurama': 120,
+  'shugakuin-rikyu': 90,
+  'genkoan': 30,
+  'sanzenin': 75,
+  // KYOTO 洛中
+  'nishiki-market': 60,
+  'nijo-castle': 90,
+  'pontocho': 45,
+  'kyoto-railway-museum': 120,
+  'higashi-honganji': 30,
+  'nishi-honganji': 30,
+  'manga-museum': 90,
+  // KYOTO 洛南
+  'fushimi-inari': 120,
+  'byodoin': 60,
+  'tofukuji': 60,
+  'daigoji': 75,
+  'ujigami-jinja': 30,
+  // OSAKA 難波
+  'dotonbori': 75,
+  'shinsaibashi': 60,
+  'kuromon': 45,
+  'hozenji-yokocho': 20,
+  'denden-town': 60,
+  'doguyasuji': 30,
+  // OSAKA 梅田
+  'umeda-sky': 60,
+  'grand-front': 75,
+  'nakanoshima-park': 45,
+  'osaka-konjakukan': 60,
+  'tenjinbashi-suji': 60,
+  'nakazakicho': 60,
+  // OSAKA 灣區
+  'usj': 480,
+  'kaiyukan': 150,
+  'expo2025': 360,
+  'maishima-park': 60,
+  'sakishima-cosmo': 45,
+  // OSAKA 天王寺
+  'abeno-harukas': 60,
+  'tsutenkaku': 45,
+  'shitennoji': 45,
+  'spa-world': 180,
+  // OSAKA 大阪城
+  'osaka-castle': 90,
+  'osaka-museum-history': 60,
+  'osaka-mint': 60,
+  // OSAKA 北大阪
+  'expo-park': 120,
+  'cupnoodle-ikeda': 75,
+  'itami-airport': 0,
+  // KOBE 三宮
+  'ikuta-jinja': 20,
+  'nankinmachi': 45,
+  'sorakuen': 45,
+  'kobe-city-museum': 60,
+  // KOBE 北野
+  'kazamidori': 45,
+  'nunobiki-herb': 120,
+  'nunobiki-falls': 45,
+  // KOBE 港
+  'kobe-port-tower': 45,
+  'be-kobe': 15,
+  'atoa': 90,
+  'disaster-memorial': 90,
+  'kobe-airport-attr': 0,
+  // KOBE 有馬
+  'arima-onsen': 180,
+  // KOBE 須磨/垂水
+  'suma-beach': 90,
+  'akashi-bridge-maiko': 60,
+  // NARA 公園
+  'todaiji': 75,
+  'kasuga-taisha': 60,
+  'nara-park': 60,
+  'nigatsudo': 30,
+  'ukimido': 20,
+  'isuien': 45,
+  // NARA 奈良町
+  'gangoji': 30,
+  'shizuka-kamameshi': 60,
+  // NARA 西之京
+  'toshodaiji': 45,
+  // NARA 斑鳩
+  'horyuji': 75,
+  // NARA 吉野
+  'hasedera': 75,
+  'yoshinoyama': 180,
+  // KIX
+  'rinku-outlets': 120,
+  'kix-skyview': 60,
+};
+
 // Coordinates from Wikipedia/Wikimedia (publicly known landmarks).
 // Photos: Wikimedia Commons CC BY-SA / public domain. Replace with own
 // photography by editing photo.thumb / photo.full in this file.
@@ -24,7 +147,9 @@ const PLACEHOLDER = {
   credit: 'placeholder',
 };
 
-export const ATTRACTIONS: Attraction[] = [
+type AttractionInput = Omit<Attraction, 'duration'>;
+
+export const ATTRACTIONS: Attraction[] = ([
   // ─── KYOTO 東山 ───────────────────────────────────────────────────
   {
     id: 'kiyomizu-dera',
@@ -1113,4 +1238,11 @@ export const ATTRACTIONS: Attraction[] = [
     photo: PLACEHOLDER,
     tags: ['top-rated', 'photogenic'],
   },
-];
+] as AttractionInput[]).map<Attraction>((a) => ({
+  ...a,
+  duration: DURATIONS[a.id] ?? 60,
+}));
+
+export const ATTRACTION_BY_ID: Record<string, Attraction> = Object.fromEntries(
+  ATTRACTIONS.map((a) => [a.id, a]),
+);
