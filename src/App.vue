@@ -2,6 +2,7 @@
 import { onMounted } from 'vue';
 import TopAppBar from '@/components/layout/TopAppBar.vue';
 import SideDrawer from '@/components/layout/SideDrawer.vue';
+import PlanFab from '@/components/layout/PlanFab.vue';
 import KansaiMap from '@/components/map/KansaiMap.vue';
 import { useMapStore } from '@/stores/map';
 import { useBreakpoint } from '@/composables/useBreakpoint';
@@ -37,5 +38,6 @@ onMounted(() => {
     </main>
 
     <SideDrawer />
+    <PlanFab />
   </div>
 </template>
