@@ -8,6 +8,22 @@ import type {
 import { RAILWAYS } from './railways';
 
 // ─── Constants ──────────────────────────────────────────────────────────
+// ─── Fare estimation ────────────────────────────────────────────────────
+const FARE_BASE_YEN = 160;
+const FARE_PER_KM_BEYOND_3KM = 30;
+const FARE_CAP_DEFAULT = 600;
+const FARE_CAP_JR_SHINKANSEN = 1200;
+const JR_SHINKANSEN_HIGH_CAP_IDS = new Set(['jr-tokaido-shinkansen']);
+
+function estimateFareYen(railwayId: string, distanceKm: number): number {
+  const beyond = Math.max(0, distanceKm - 3);
+  const raw = FARE_BASE_YEN + beyond * FARE_PER_KM_BEYOND_3KM;
+  const cap = JR_SHINKANSEN_HIGH_CAP_IDS.has(railwayId)
+    ? FARE_CAP_JR_SHINKANSEN
+    : FARE_CAP_DEFAULT;
+  return Math.min(Math.round(raw / 10) * 10, cap);
+}
+
 const WALK_KMH = 4.5;          // city walking pace
 const TRAIN_KMH = 32;          // average urban rail (incl. station dwell)
 const WAIT_MIN = 3;            // mean platform wait per boarding
@@ -347,17 +363,21 @@ export function commuteBetween(
   const directKm = haversineKm(from.coord, to.coord);
   if (directKm < 1.2) {
     const minutes = walkMinutes(directKm);
+    const meters = directKm * 1000;
     return {
       totalMinutes: minutes,
       segments: [
         {
           mode: 'walk',
           minutes,
-          meters: directKm * 1000,
+          meters,
           label: `步行 ${Math.round(minutes)} 分`,
+          fareYen: 0,
         },
       ],
       path: [from.coord, to.coord],
+      totalFareYen: 0,
+      totalWalkMeters: meters,
     };
   }
 
@@ -378,6 +398,15 @@ export function commuteBetween(
     const railMin = trainMinutes(directKm) * 1.3 + WAIT_MIN * 2;
     const walkBuffer = 18; // ~9 min each end
     const minutes = railMin + walkBuffer;
+    // Estimate a fallback fare based on the straight-line distance using the
+    // default cap (no specific railway is known).
+    const beyond = Math.max(0, directKm - 3);
+    const fallbackFare = Math.min(
+      Math.round((FARE_BASE_YEN + beyond * FARE_PER_KM_BEYOND_3KM) / 10) * 10,
+      FARE_CAP_DEFAULT,
+    );
+    // Walk buffer minutes converted to an approximate meters value.
+    const fallbackWalkMeters = (walkBuffer / 60) * WALK_KMH * 1000;
     return {
       totalMinutes: minutes,
       segments: [
@@ -385,9 +414,12 @@ export function commuteBetween(
           mode: 'train',
           minutes,
           label: `估算搭車約 ${Math.round(minutes)} 分（路線資料未涵蓋）`,
+          fareYen: fallbackFare,
         },
       ],
       path: [from.coord, to.coord],
+      totalFareYen: fallbackFare,
+      totalWalkMeters: fallbackWalkMeters,
     };
   }
 
@@ -420,6 +452,7 @@ export function commuteBetween(
       minutes: firstSource.minutes,
       meters: firstSource.meters,
       label: `步行 ${Math.round(firstSource.minutes)} 分至 ${firstSource.node.stationName}`,
+      fareYen: 0,
     });
   }
   if (firstSource) appendCoord(firstSource.node.coord);
@@ -435,6 +468,14 @@ export function commuteBetween(
   const flushRail = () => {
     if (!railRun) return;
     const r = RAILWAYS.find((x) => x.id === railRun!.railwayId);
+    // Compute leg distance using the station coordinates on this railway.
+    let legKm = 0;
+    if (r) {
+      const fromStn = r.stations.find((s) => s.name_zh === railRun!.fromStation);
+      const toStn = r.stations.find((s) => s.name_zh === railRun!.toStation);
+      if (fromStn && toStn) legKm = haversineKm(fromStn.coord, toStn.coord);
+    }
+    const fareYen = estimateFareYen(railRun.railwayId, legKm);
     segments.push({
       mode: 'train',
       minutes: railRun.minutes,
@@ -442,6 +483,7 @@ export function commuteBetween(
       fromStation: railRun.fromStation,
       toStation: railRun.toStation,
       label: `搭${r ? r.name_zh : railRun.railwayId} ${railRun.fromStation} → ${railRun.toStation}（${railRun.stops} 站 / ${Math.round(railRun.minutes)} 分）`,
+      fareYen,
     });
     // Append the railway-shaped slice between from/to stations to the path
     if (r) {
@@ -482,6 +524,7 @@ export function commuteBetween(
         fromStation: e.fromStation,
         toStation: e.toStation,
         label: `${e.fromStation} 站內轉乘（${Math.round(e.minutes)} 分）`,
+        fareYen: 0,
       });
       const toNode = NODES.get(e.to);
       if (toNode) appendCoord(toNode.coord);
@@ -494,6 +537,7 @@ export function commuteBetween(
         fromStation: e.fromStation,
         toStation: e.toStation,
         label: `${e.fromStation} → ${e.toStation} 步行 ${Math.round(e.minutes)} 分`,
+        fareYen: 0,
       });
       const toNode = NODES.get(e.to);
       if (toNode) appendCoord(toNode.coord);
@@ -510,6 +554,7 @@ export function commuteBetween(
         minutes: walkOut,
         meters: endAccess.meters,
         label: `${endAccess.node.stationName} 步行 ${Math.round(walkOut)} 分至景點`,
+        fareYen: 0,
       });
     }
   }
@@ -517,23 +562,36 @@ export function commuteBetween(
 
   // If somehow all segments dropped, give a single combined walk
   if (segments.length === 0) {
+    const fallbackMeters = (total / 60) * WALK_KMH * 1000;
     return {
       totalMinutes: total,
       segments: [
         {
           mode: 'walk',
           minutes: total,
+          meters: fallbackMeters,
           label: `步行 ${Math.round(total)} 分`,
+          fareYen: 0,
         },
       ],
       path: [from.coord, to.coord],
+      totalFareYen: 0,
+      totalWalkMeters: fallbackMeters,
     };
   }
 
   // Suppress unused dist var (kept for potential debug)
   void dist;
 
-  return { totalMinutes: total, segments, path: pathCoords };
+  // Roll up totals
+  let totalFareYen = 0;
+  let totalWalkMeters = 0;
+  for (const s of segments) {
+    if (s.fareYen) totalFareYen += s.fareYen;
+    if (s.mode === 'walk' && s.meters) totalWalkMeters += s.meters;
+  }
+
+  return { totalMinutes: total, segments, path: pathCoords, totalFareYen, totalWalkMeters };
 }
 
 // ─── Memoization cache (recompute is non-trivial) ───────────────────────
