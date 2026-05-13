@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, watch, h, render, type VNode } from 'vue';
+import { onMounted, onBeforeUnmount, ref, computed, watch, h, render, type VNode } from 'vue';
 import maplibregl, { Map as MlMap, Marker } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { NEON_DARK_STYLE } from './style';
@@ -15,13 +15,39 @@ import type { MapStation } from '@/types';
 import { useMapStore } from '@/stores/map';
 import CityMarker from './CityMarker.vue';
 import MapControls from './MapControls.vue';
-import type { City } from '@/types';
+import { useGlicoRunner } from '@/composables/useGlicoRunner';
+import type { City, LngLat } from '@/types';
 
 const store = useMapStore();
 const containerRef = ref<HTMLElement | null>(null);
 // Reactive map handle so composables can react to map availability.
 const mapRef = ref<MlMap | null>(null);
 let map: MlMap | null = null;
+
+// Glico runner: chase the first day's full commute path while a plan is active.
+const runnerCoords = computed<LngLat[] | null>(() => {
+  const it = store.itinerary;
+  if (!it) return null;
+  const day = it.days[0];
+  if (!day) return null;
+  const out: LngLat[] = [];
+  for (const stop of day.stops) {
+    if (!stop.commute || !stop.commute.path) continue;
+    for (const c of stop.commute.path) {
+      const last = out[out.length - 1];
+      if (!last || last[0] !== c[0] || last[1] !== c[1]) out.push(c);
+    }
+  }
+  return out.length >= 2 ? out : null;
+});
+useGlicoRunner({
+  map: mapRef,
+  coords: runnerCoords,
+  playing: ref(true),
+  // Mascot is symbolic — sprint the whole day's path in a minute or so.
+  speedKmh: 300,
+  loop: true,
+});
 let cityMarkers: Marker[] = [];
 let attractionMarkers: Marker[] = [];
 let prefMarkers: Marker[] = [];
