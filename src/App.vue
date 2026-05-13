@@ -4,13 +4,17 @@ import TopAppBar from '@/components/layout/TopAppBar.vue';
 import SideDrawer from '@/components/layout/SideDrawer.vue';
 import PlanFab from '@/components/layout/PlanFab.vue';
 import KansaiMap from '@/components/map/KansaiMap.vue';
+import PrintItinerary from '@/components/panels/PrintItinerary.vue';
 import { useMapStore } from '@/stores/map';
 import { useBreakpoint } from '@/composables/useBreakpoint';
 import { playKixChime } from '@/audio/chime';
+import { applyShareHashOnLoad } from '@/utils/itinerary-share';
 import type { CityId } from '@/types';
 
 const store = useMapStore();
 const { isMobile, isDesktop } = useBreakpoint();
+
+applyShareHashOnLoad();
 
 function selectCity(id: CityId) {
   store.selectCity(id);
@@ -39,5 +43,6 @@ onMounted(() => {
 
     <SideDrawer />
     <PlanFab />
+    <PrintItinerary :itinerary="store.itinerary" />
   </div>
 </template>
