@@ -7,6 +7,7 @@ import { planItinerary, recommendItinerary } from '@/data/planner';
 import { RAILWAY_BY_ID } from '@/data/railways';
 import PlanPrefsCard from './PlanPrefsCard.vue';
 import PlanSurpriseButton from './PlanSurpriseButton.vue';
+import PlanShareBar from './PlanShareBar.vue';
 import type { CityId, CommuteSegment, PlannerPrefs } from '@/types';
 
 const store = useMapStore();
@@ -202,10 +203,11 @@ const itinerary = computed(() => store.itinerary);
 
     <!-- Result -->
     <div v-if="itinerary" class="space-y-3 pt-2 border-t border-line">
-      <div class="flex justify-between items-center">
-        <h3 class="font-display text-base font-extrabold">行程結果</h3>
+      <div class="flex justify-between items-center gap-2">
+        <h3 class="font-display text-base font-extrabold flex-1">行程結果</h3>
+        <PlanShareBar :itinerary="itinerary" />
         <button
-          class="text-xs text-ink-soft hover:text-ink"
+          class="text-xs text-ink-soft hover:text-ink ml-1"
           @click="clearPlan"
         >
           清除
