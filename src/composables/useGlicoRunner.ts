@@ -172,7 +172,10 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
       return;
     }
     if (lastTs == null) lastTs = ts;
-    const dtSec = Math.min(0.1, (ts - lastTs) / 1000);
+    // Allow up to 0.5s of catch-up per tick so background-throttled timers
+    // (browsers clamp setInterval to ~1s in hidden tabs) still advance the
+    // runner visibly when they fire.
+    const dtSec = Math.min(0.5, (ts - lastTs) / 1000);
     lastTs = ts;
 
     const advanceKm = (speedKmh / 3600) * dtSec;
