@@ -101,6 +101,8 @@ export interface CommuteSegment {
   label: string;
   fromStation?: string;
   toStation?: string;
+  /** Yen fare for this segment. 0 for walk/transfer. */
+  fareYen?: number;
 }
 
 export interface CommutePlan {
@@ -109,6 +111,10 @@ export interface CommutePlan {
   /** Full coordinate polyline from origin attraction to destination attraction,
    *  with railway curves sliced from the corresponding line geometry. */
   path: LngLat[];
+  /** Total yen across all train segments. */
+  totalFareYen: number;
+  /** Total walking distance in meters across all walk segments. */
+  totalWalkMeters: number;
 }
 
 export interface ItineraryStop {
