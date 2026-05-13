@@ -57,16 +57,25 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
   </g>
 </svg>`.trim();
 
-  function makeRunnerEl(): HTMLDivElement {
-    const wrap = document.createElement('div');
-    wrap.className = 'glico-runner';
-    wrap.style.width = '44px';
-    wrap.style.height = '48px';
-    wrap.style.pointerEvents = 'none';
-    wrap.style.willChange = 'transform';
-    wrap.style.transformOrigin = 'center center';
-    wrap.innerHTML = SVG_MARKUP;
-    return wrap;
+  // Outer wrapper is positioned by MapLibre via translate3d on its style.
+  // We never touch the outer transform. Rotation/flip is applied to an inner
+  // div instead, so MapLibre's positioning and our rotation don't fight each
+  // other (last-write-wins on style.transform).
+  function makeRunnerEl(): { outer: HTMLDivElement; inner: HTMLDivElement } {
+    const outer = document.createElement('div');
+    outer.className = 'glico-runner';
+    outer.style.width = '44px';
+    outer.style.height = '48px';
+    outer.style.pointerEvents = 'none';
+
+    const inner = document.createElement('div');
+    inner.style.width = '100%';
+    inner.style.height = '100%';
+    inner.style.willChange = 'transform';
+    inner.style.transformOrigin = 'center center';
+    inner.innerHTML = SVG_MARKUP;
+    outer.appendChild(inner);
+    return { outer, inner };
   }
 
   // --- Geo helpers -------------------------------------------------------
@@ -91,6 +100,7 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
   // --- State -------------------------------------------------------------
   let marker: maplibregl.Marker | null = null;
   let el: HTMLDivElement | null = null;
+  let innerEl: HTMLDivElement | null = null;
   let rafId: number | null = null;
   let lastTs: number | null = null;
   let segIndex = 0;
@@ -102,7 +112,9 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
     const m = opts.map.value;
     if (!m) return null;
     if (!marker) {
-      el = makeRunnerEl();
+      const made = makeRunnerEl();
+      el = made.outer;
+      innerEl = made.inner;
       marker = new maplibregl.Marker({ element: el, anchor: 'center' });
     }
     return marker;
@@ -135,11 +147,12 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
   }
 
   function applyTransform(rotationDeg: number, flipX: boolean) {
-    if (!el) return;
+    if (!innerEl) return;
     // Rotation: 0 = facing right (east). flipX mirrors for west travel.
-    // Pitch the body slightly for steep up/down.
+    // Applied on the inner element so MapLibre's translate3d on the outer
+    // wrapper isn't clobbered.
     const sx = flipX ? -1 : 1;
-    el.style.transform = `scaleX(${sx}) rotate(${rotationDeg}deg)`;
+    innerEl.style.transform = `scaleX(${sx}) rotate(${rotationDeg}deg)`;
   }
 
   function step(ts: number) {
@@ -236,6 +249,7 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
         detachMarker();
         marker = null;
         el = null;
+        innerEl = null;
       } else if (activeCoords.length >= 2) {
         attachMarker();
         startLoop();
@@ -274,5 +288,6 @@ export function useGlicoRunner(opts: GlicoRunnerOptions) {
     detachMarker();
     marker = null;
     el = null;
+    innerEl = null;
   });
 }
