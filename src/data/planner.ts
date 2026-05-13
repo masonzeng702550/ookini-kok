@@ -4,6 +4,7 @@ import type {
   Itinerary,
   ItineraryDay,
   ItineraryStop,
+  PlannerPrefs,
 } from '@/types';
 import { ATTRACTIONS, ATTRACTION_BY_ID } from './attractions';
 import { commuteBetweenCached, distanceKm } from './commute';
@@ -219,22 +220,39 @@ export function planItinerary(
 }
 
 // ─── Recommendation: pick best attractions for region + days ────────────
-function attractionScore(a: Attraction): number {
+function attractionScore(a: Attraction, prefs?: PlannerPrefs): number {
   let s = 1;
   if (a.tags?.includes('top-rated')) s += 4;
   if (a.tags?.includes('photogenic')) s += 1;
   if (a.tags?.includes('family')) s += 0.8;
+  const theme = prefs?.theme;
+  if (theme === 'food') {
+    if (a.iconSymbol === 'restaurant' || a.iconSymbol === 'nightlife') s += 3;
+  } else if (theme === 'temple') {
+    if (a.iconSymbol.startsWith('temple_')) s += 3;
+  } else if (theme === 'family') {
+    if (a.tags?.includes('family')) s += 3;
+  } else if (theme === 'photo') {
+    if (a.tags?.includes('photogenic')) s += 3;
+  }
   return s;
 }
 
 export function recommendItinerary(
   regions: CityId[],
   dayCount: number,
+  prefs?: PlannerPrefs,
 ): Itinerary {
-  const pool = ATTRACTIONS.filter(
-    (a) => (a.duration ?? 0) > 0 && regions.includes(a.cityId),
-  );
-  const ranked = pool.slice().sort((a, b) => attractionScore(b) - attractionScore(a));
+  const excluded = new Set(prefs?.excludedTags ?? []);
+  const pool = ATTRACTIONS.filter((a) => {
+    if ((a.duration ?? 0) <= 0) return false;
+    if (!regions.includes(a.cityId)) return false;
+    if (excluded.size > 0 && a.tags?.some((t) => excluded.has(t))) return false;
+    return true;
+  });
+  const ranked = pool
+    .slice()
+    .sort((a, b) => attractionScore(b, prefs) - attractionScore(a, prefs));
 
   // Budget-aware picking: reserve ~30% of the day for commute.
   // Skip individual attractions that would single-handedly burn an entire
@@ -257,5 +275,30 @@ export function recommendItinerary(
   const it = planItinerary(picked.map((a) => a.id), dayCount);
   it.meta.mode = 'recommend';
   it.meta.regions = regions;
+  return it;
+}
+
+// ─── Surprise me: randomized recommendation ─────────────────────────────
+export function surpriseMe(
+  dayCount: number,
+  theme?: PlannerPrefs['theme'],
+): Itinerary {
+  const ALL_REGIONS: CityId[] = ['osaka', 'kyoto', 'kobe', 'nara'];
+  const shuffled = ALL_REGIONS.slice().sort(() => Math.random() - 0.5);
+  const pickCount = 1 + Math.floor(Math.random() * 2); // 1 or 2
+  const regions = shuffled.slice(0, pickCount);
+
+  const THEMES: NonNullable<PlannerPrefs['theme']>[] = [
+    'food',
+    'temple',
+    'family',
+    'photo',
+    'mix',
+  ];
+  const chosenTheme: PlannerPrefs['theme'] =
+    theme ?? THEMES[Math.floor(Math.random() * THEMES.length)];
+
+  const it = recommendItinerary(regions, dayCount, { theme: chosenTheme });
+  it.meta.mode = 'recommend';
   return it;
 }
