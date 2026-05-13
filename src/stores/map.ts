@@ -4,7 +4,7 @@ import { DISTRICTS, DISTRICT_BY_ID } from '@/data/districts';
 import { ATTRACTIONS } from '@/data/attractions';
 import { RAILWAY_BY_ID } from '@/data/railways';
 import { STATIONS } from '@/data/stations';
-import type { CityId, DrawerTab, ZoomLevel } from '@/types';
+import type { CityId, DrawerTab, Itinerary, ZoomLevel } from '@/types';
 
 interface State {
   activeTab: DrawerTab;
@@ -15,6 +15,9 @@ interface State {
   activeStationId: string | null;
   zoomLevel: ZoomLevel;
   drawerOpen: boolean;
+  itinerary: Itinerary | null;
+  /** Attractions the user has shortlisted for itinerary planning. */
+  selectedIds: string[];
 }
 
 export const useMapStore = defineStore('map', {
@@ -27,6 +30,8 @@ export const useMapStore = defineStore('map', {
     activeStationId: null,
     zoomLevel: 'overview',
     drawerOpen: true,
+    itinerary: null,
+    selectedIds: [],
   }),
   getters: {
     cities: () => CITIES,
@@ -103,6 +108,17 @@ export const useMapStore = defineStore('map', {
       this.activeRailwayId = null;
       this.activeAttractionId = null;
       this.activeStationId = null;
+    },
+    toggleSelected(id: string) {
+      const idx = this.selectedIds.indexOf(id);
+      if (idx >= 0) this.selectedIds.splice(idx, 1);
+      else this.selectedIds.push(id);
+    },
+    clearSelected() {
+      this.selectedIds = [];
+    },
+    setItinerary(it: Itinerary | null) {
+      this.itinerary = it;
     },
   },
 });

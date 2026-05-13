@@ -111,6 +111,35 @@ export interface CommutePlan {
   path: LngLat[];
 }
 
+export interface ItineraryStop {
+  attractionId: string;
+  /** Minutes spent at this stop (= attraction.duration). */
+  stayMinutes: number;
+  /** Commute from PREVIOUS stop to this stop. First stop has no commute. */
+  commute?: CommutePlan;
+}
+
+export interface ItineraryDay {
+  /** 0-indexed day number. */
+  dayIndex: number;
+  stops: ItineraryStop[];
+  /** Total commute minutes for the day. */
+  commuteMinutes: number;
+  /** Total stay minutes for the day. */
+  stayMinutes: number;
+}
+
+export interface Itinerary {
+  days: ItineraryDay[];
+  /** Snapshot of inputs that produced this itinerary. */
+  meta: {
+    selectedIds: string[];
+    dayCount: number;
+    regions: CityId[];
+    mode: 'manual' | 'recommend';
+  };
+}
+
 export type StationKind = 'hub' | 'terminus';
 
 export interface MapStation {
