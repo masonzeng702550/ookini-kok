@@ -8,6 +8,7 @@ import { RAILWAY_BY_ID } from '@/data/railways';
 import PlanPrefsCard from './PlanPrefsCard.vue';
 import PlanSurpriseButton from './PlanSurpriseButton.vue';
 import PlanShareBar from './PlanShareBar.vue';
+import PlanEconomicsCard from './PlanEconomicsCard.vue';
 import type { CityId, CommuteSegment, PlannerPrefs } from '@/types';
 
 const store = useMapStore();
@@ -213,6 +214,9 @@ const itinerary = computed(() => store.itinerary);
           清除
         </button>
       </div>
+
+      <!-- Cost / walking / pass summary -->
+      <PlanEconomicsCard :itinerary="itinerary" />
 
       <div
         v-for="day in itinerary.days"
