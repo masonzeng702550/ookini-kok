@@ -5,12 +5,19 @@ import { ATTRACTIONS, ATTRACTION_BY_ID } from '@/data/attractions';
 import { CITIES } from '@/data/cities';
 import { planItinerary, recommendItinerary } from '@/data/planner';
 import { RAILWAY_BY_ID } from '@/data/railways';
-import type { CityId, CommuteSegment } from '@/types';
+import PlanPrefsCard from './PlanPrefsCard.vue';
+import type { CityId, CommuteSegment, PlannerPrefs } from '@/types';
 
 const store = useMapStore();
 
 const dayCount = ref<number>(3);
 const selectedRegions = ref<CityId[]>(['osaka', 'kyoto']);
+const prefs = ref<PlannerPrefs>({
+  theme: 'mix',
+  excludedTags: [],
+  maxWalkKm: 8,
+  startTime: '08:30',
+});
 
 const REGION_LABEL: Record<CityId, string> = {
   osaka: '大阪',
@@ -130,6 +137,9 @@ const itinerary = computed(() => store.itinerary);
         </button>
       </div>
     </div>
+
+    <!-- Preferences card -->
+    <PlanPrefsCard v-model="prefs" />
 
     <button
       class="w-full py-2.5 rounded-lg bg-neon-cyan text-ink font-bold text-sm hover:opacity-90 transition"
