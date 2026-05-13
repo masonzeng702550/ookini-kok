@@ -5,9 +5,11 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { NEON_DARK_STYLE } from './style';
 import { CITIES } from '@/data/cities';
 import { DISTRICTS } from '@/data/districts';
-import { ATTRACTIONS } from '@/data/attractions';
+import { ATTRACTIONS, ATTRACTION_BY_ID } from '@/data/attractions';
 import { STATIONS } from '@/data/stations';
 import { railwaysToGeoJSON, districtsToGeoJSON } from '@/data/geo';
+import type { FeatureCollection, LineString } from 'geojson';
+import type { Itinerary } from '@/types';
 import { playKixChime, playMidosujiChime, playItamiChime } from '@/audio/chime';
 import type { MapStation } from '@/types';
 import { useMapStore } from '@/stores/map';
@@ -23,6 +25,73 @@ let attractionMarkers: Marker[] = [];
 let prefMarkers: Marker[] = [];
 let stationMarkers: Marker[] = [];
 let resizeObserver: ResizeObserver | null = null;
+
+const DAY_COLORS = [
+  '#e63946',
+  '#2a7da3',
+  '#6fbe3f',
+  '#ff7a00',
+  '#7a3ad9',
+  '#1f9d8a',
+  '#d49142',
+];
+
+function emptyItineraryGeoJSON(): FeatureCollection<LineString> {
+  return { type: 'FeatureCollection', features: [] };
+}
+
+/**
+ * Render a small right-pointing arrow as an ImageData so we can register it
+ * as a MapLibre SDF icon. SDF mode lets us tint the same image per-feature
+ * via the `icon-color` paint property, matching each day's route color.
+ */
+function makeArrowImage(): { width: number; height: number; data: Uint8Array } {
+  const size = 18;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.moveTo(size - 2, size / 2);
+  ctx.lineTo(3, 3);
+  ctx.lineTo(3, size - 3);
+  ctx.closePath();
+  ctx.fill();
+  const img = ctx.getImageData(0, 0, size, size);
+  return { width: size, height: size, data: new Uint8Array(img.data.buffer) };
+}
+
+function itineraryToGeoJSON(it: Itinerary): FeatureCollection<LineString> {
+  // One feature per "leg" (attraction → attraction commute) so the polyline
+  // can follow the real walking + railway-curve path instead of a straight
+  // line. Each leg inherits its day's color.
+  const features: FeatureCollection<LineString>['features'] = [];
+  it.days.forEach((day, dayIdx) => {
+    const color = DAY_COLORS[dayIdx % DAY_COLORS.length];
+    for (let i = 1; i < day.stops.length; i++) {
+      const stop = day.stops[i];
+      const fromA = ATTRACTION_BY_ID[day.stops[i - 1].attractionId];
+      const toA = ATTRACTION_BY_ID[stop.attractionId];
+      if (!fromA || !toA) continue;
+      const coords =
+        stop.commute && stop.commute.path && stop.commute.path.length >= 2
+          ? stop.commute.path
+          : [fromA.coord, toA.coord];
+      features.push({
+        type: 'Feature',
+        properties: {
+          dayIndex: dayIdx,
+          legIndex: i - 1,
+          color,
+        },
+        geometry: { type: 'LineString', coordinates: coords as [number, number][] },
+      });
+    }
+  });
+  return { type: 'FeatureCollection', features };
+}
 
 // Kansai bounds
 const KANSAI_CENTER: [number, number] = [135.6, 34.75];
@@ -519,6 +588,60 @@ onMounted(async () => {
       return m;
     });
 
+    // Itinerary route layer — drawn on demand when store.itinerary changes
+    map.addSource('itinerary', {
+      type: 'geojson',
+      data: emptyItineraryGeoJSON(),
+    });
+    map.addLayer({
+      id: 'itinerary-glow',
+      type: 'line',
+      source: 'itinerary',
+      paint: {
+        'line-color': ['get', 'color'],
+        'line-width': 9,
+        'line-opacity': 0.25,
+        'line-blur': 4,
+      },
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+    });
+    map.addLayer({
+      id: 'itinerary-line',
+      type: 'line',
+      source: 'itinerary',
+      paint: {
+        'line-color': ['get', 'color'],
+        'line-width': 3.5,
+        'line-opacity': 0.95,
+        'line-dasharray': [2, 1.4],
+      },
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+    });
+
+    // Direction arrows along each day's path. Image is registered as SDF so
+    // we can tint it per-feature using the same 'color' property the lines use.
+    map.addImage('itin-arrow', makeArrowImage(), { sdf: true });
+    map.addLayer({
+      id: 'itinerary-arrows',
+      type: 'symbol',
+      source: 'itinerary',
+      layout: {
+        'symbol-placement': 'line',
+        'symbol-spacing': 70,
+        'icon-image': 'itin-arrow',
+        'icon-size': 0.9,
+        'icon-rotation-alignment': 'map',
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
+        'icon-padding': 2,
+      },
+      paint: {
+        'icon-color': ['get', 'color'],
+        'icon-halo-color': '#fffaee',
+        'icon-halo-width': 1.5,
+      },
+    });
+
     // Initial visibility
     setVisibilityForZoom(map.getZoom());
     map.on('zoom', () => {
@@ -581,6 +704,69 @@ watch(
     if (!d) return;
     map.flyTo({ center: d.labelCoord, zoom: 11.5, speed: 0.9 });
   },
+);
+
+// Itinerary route — push to map source whenever the plan changes
+watch(
+  () => store.itinerary,
+  (it) => {
+    if (!map) return;
+    const src = map.getSource('itinerary') as
+      | maplibregl.GeoJSONSource
+      | undefined;
+    if (!src) return;
+
+    // Mute the railway colors while a plan is shown so the itinerary's
+    // dashed colored route is the dominant line on the map. Restore the
+    // per-line palette when the plan is cleared.
+    if (map.getLayer('rail-main')) {
+      if (it) {
+        map.setPaintProperty('rail-main', 'line-color', '#b3a594');
+        map.setPaintProperty('rail-main', 'line-opacity', 0.35);
+        map.setPaintProperty('rail-main', 'line-width', 2.2);
+      } else {
+        map.setPaintProperty('rail-main', 'line-color', ['get', 'color']);
+        map.setPaintProperty('rail-main', 'line-opacity', 0.95);
+        map.setPaintProperty('rail-main', 'line-width', 3.2);
+      }
+    }
+
+    if (!it) {
+      src.setData(emptyItineraryGeoJSON());
+      return;
+    }
+    const gj = itineraryToGeoJSON(it);
+    src.setData(gj);
+
+    // Fit map to all itinerary stops
+    const allCoords: [number, number][] = [];
+    for (const day of it.days) {
+      for (const stop of day.stops) {
+        const c = ATTRACTION_BY_ID[stop.attractionId]?.coord;
+        if (c) allCoords.push(c);
+      }
+    }
+    if (allCoords.length >= 2) {
+      let minLng = Infinity,
+        minLat = Infinity,
+        maxLng = -Infinity,
+        maxLat = -Infinity;
+      for (const [lng, lat] of allCoords) {
+        if (lng < minLng) minLng = lng;
+        if (lng > maxLng) maxLng = lng;
+        if (lat < minLat) minLat = lat;
+        if (lat > maxLat) maxLat = lat;
+      }
+      map.fitBounds(
+        [
+          [minLng, minLat],
+          [maxLng, maxLat],
+        ],
+        { padding: 80, duration: 900, maxZoom: 12 },
+      );
+    }
+  },
+  { deep: false },
 );
 
 function zoomIn() {
