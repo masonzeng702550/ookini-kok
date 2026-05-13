@@ -52,7 +52,9 @@ function generateManual() {
 
 function generateRecommend() {
   if (selectedRegions.value.length === 0) return;
-  store.setItinerary(recommendItinerary(selectedRegions.value, dayCount.value));
+  store.setItinerary(
+    recommendItinerary(selectedRegions.value, dayCount.value, prefs.value),
+  );
 }
 
 function clearPlan() {
