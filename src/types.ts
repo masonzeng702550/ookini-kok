@@ -26,6 +26,13 @@ export interface District {
 
 export type AttractionTag = 'top-rated' | 'spicy' | 'open-now' | 'family' | 'photogenic';
 
+export interface PlannerPrefs {
+  excludedTags?: AttractionTag[];          // skip attractions with these tags
+  maxWalkKm?: number;                       // soft cap per-day walking (km)
+  startTime?: string;                       // 'HH:MM', display only
+  theme?: 'food' | 'temple' | 'family' | 'photo' | 'mix';
+}
+
 export interface Attraction {
   id: string;
   districtId: string;
