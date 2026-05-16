@@ -1,15 +1,25 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Attraction } from '@/types';
 import PhotoImage from '@/components/ui/PhotoImage.vue';
 import NeonChip from '@/components/ui/NeonChip.vue';
+import { useMapStore } from '@/stores/map';
 
-defineProps<{ attraction: Attraction; active?: boolean }>();
+const props = defineProps<{ attraction: Attraction; active?: boolean }>();
 defineEmits<{ click: [id: string] }>();
+
+const store = useMapStore();
+const isFavorite = computed(() => store.favoriteIds.includes(props.attraction.id));
+
+function toggleFavorite(ev: MouseEvent) {
+  ev.stopPropagation();
+  store.toggleFavorite(props.attraction.id);
+}
 </script>
 
 <template>
   <button
-    class="group w-full text-left p-3 rounded-xl border transition-all"
+    class="group w-full text-left p-3 rounded-xl border transition-all relative"
     :class="
       active
         ? 'border-neon-pink/70 bg-neon-pink/10 shadow-paper'
@@ -17,6 +27,23 @@ defineEmits<{ click: [id: string] }>();
     "
     @click="$emit('click', attraction.id)"
   >
+    <span
+      role="button"
+      class="absolute top-2 right-2 w-7 h-7 rounded-full grid place-items-center transition cursor-pointer"
+      :class="
+        isFavorite
+          ? 'text-neon-pink bg-white/85 shadow-paper'
+          : 'text-ink-faint bg-white/60 opacity-0 group-hover:opacity-100 hover:text-neon-pink'
+      "
+      :aria-label="isFavorite ? '取消收藏' : '加入收藏'"
+      @click="toggleFavorite($event)"
+    >
+      <span
+        class="material-symbols-outlined text-[18px]"
+        :class="isFavorite ? 'filled' : ''"
+        >favorite</span
+      >
+    </span>
     <div class="flex gap-3">
       <div class="w-20 h-20 shrink-0">
         <PhotoImage
