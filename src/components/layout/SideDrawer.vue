@@ -5,6 +5,7 @@ import { useBreakpoint } from '@/composables/useBreakpoint';
 import AreaDetailsPanel from '@/components/panels/AreaDetailsPanel.vue';
 import AttractionsList from '@/components/panels/AttractionsList.vue';
 import RailwayPanel from '@/components/panels/RailwayPanel.vue';
+import FavoritesPanel from '@/components/panels/FavoritesPanel.vue';
 import OsakaMotif from '@/components/ui/OsakaMotif.vue';
 import type { DrawerTab } from '@/types';
 
@@ -80,6 +81,7 @@ const drawerClass = computed(() =>
       <AreaDetailsPanel v-if="store.activeTab === 'area'" />
       <AttractionsList v-else-if="store.activeTab === 'attractions'" />
       <RailwayPanel v-else-if="store.activeTab === 'railways'" />
+      <FavoritesPanel v-else-if="store.activeTab === 'favorites'" />
       <div
         v-else
         class="px-6 py-10 text-center"
