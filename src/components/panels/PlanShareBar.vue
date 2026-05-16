@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import type { Itinerary } from '@/types';
 import { buildShareUrl } from '@/utils/itinerary-share';
+import { downloadItineraryICS } from '@/utils/itinerary-ics';
 
 const props = defineProps<{ itinerary: Itinerary | null }>();
 
@@ -44,6 +45,11 @@ function onPrint() {
   if (disabled.value) return;
   window.print();
 }
+
+function onCalendar() {
+  if (disabled.value || !props.itinerary) return;
+  downloadItineraryICS(props.itinerary, { shareUrl: buildShareUrl(props.itinerary) });
+}
 </script>
 
 <template>
@@ -57,6 +63,16 @@ function onPrint() {
       @click="onShare"
     >
       <span class="material-symbols-outlined text-[18px]">share</span>
+    </button>
+    <button
+      type="button"
+      class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-line bg-paper-soft text-ink hover:bg-paper transition disabled:opacity-40 disabled:cursor-not-allowed"
+      :disabled="disabled"
+      aria-label="匯出行事曆"
+      title="匯出 .ics 行事曆檔"
+      @click="onCalendar"
+    >
+      <span class="material-symbols-outlined text-[18px]">calendar_month</span>
     </button>
     <button
       type="button"
