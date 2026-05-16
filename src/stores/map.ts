@@ -18,6 +18,31 @@ interface State {
   itinerary: Itinerary | null;
   /** Attractions the user has shortlisted for itinerary planning. */
   selectedIds: string[];
+  /** Attractions the user has favorited (heart-tapped). Persisted. */
+  favoriteIds: string[];
+}
+
+const FAV_KEY = 'okini-favorites';
+
+function readFavorites(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(FAV_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeFavorites(ids: string[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(FAV_KEY, JSON.stringify(ids));
+  } catch {
+    /* quota exceeded or private-mode — fail silently */
+  }
 }
 
 export const useMapStore = defineStore('map', {
@@ -32,6 +57,7 @@ export const useMapStore = defineStore('map', {
     drawerOpen: true,
     itinerary: null,
     selectedIds: [],
+    favoriteIds: readFavorites(),
   }),
   getters: {
     cities: () => CITIES,
@@ -119,6 +145,15 @@ export const useMapStore = defineStore('map', {
     },
     setItinerary(it: Itinerary | null) {
       this.itinerary = it;
+    },
+    toggleFavorite(id: string) {
+      const idx = this.favoriteIds.indexOf(id);
+      if (idx >= 0) this.favoriteIds.splice(idx, 1);
+      else this.favoriteIds.push(id);
+      writeFavorites(this.favoriteIds);
+    },
+    isFavorite(id: string): boolean {
+      return this.favoriteIds.includes(id);
     },
   },
 });
