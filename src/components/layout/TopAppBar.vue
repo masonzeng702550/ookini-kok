@@ -69,9 +69,13 @@ const isActive = (id: CityId) => computed(() => store.activeCityId === id);
       </div>
       <button
         class="p-2 rounded-full text-ink-soft hover:text-neon-pink hover:bg-paper-soft transition"
-        aria-label="地圖視角"
+        :aria-label="store.theme === 'night' ? '切換到日間配色' : '切換到夜間配色'"
+        :title="store.theme === 'night' ? '日間' : '夜間'"
+        @click="store.toggleTheme()"
       >
-        <span class="material-symbols-outlined">map</span>
+        <span class="material-symbols-outlined filled">
+          {{ store.theme === 'night' ? 'light_mode' : 'dark_mode' }}
+        </span>
       </button>
       <button
         class="p-2 rounded-full text-ink-soft hover:text-neon-pink hover:bg-paper-soft transition"
