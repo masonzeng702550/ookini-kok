@@ -56,6 +56,76 @@ let prefMarkers: Marker[] = [];
 let stationMarkers: Marker[] = [];
 let resizeObserver: ResizeObserver | null = null;
 
+interface ThemePalette {
+  bg: string;
+  sea: string;
+  seaEdge: string;
+  mountains: string;
+  mountainsEdge: string;
+  rivers: string;
+  islandFill: string;
+  islandEdge: string;
+  ferry: string;
+  prefBorder: string;
+  districtOpacity: number;
+}
+
+const PALETTES: Record<'day' | 'night', ThemePalette> = {
+  day: {
+    bg: '#f4ebd4',
+    sea: '#a3d5e3',
+    seaEdge: '#3a8da3',
+    mountains: '#b2c99c',
+    mountainsEdge: '#7e9863',
+    rivers: '#5fb6c8',
+    islandFill: '#f4ebd4',
+    islandEdge: '#3a8da3',
+    ferry: '#3a8da3',
+    prefBorder: '#a89683',
+    districtOpacity: 0.14,
+  },
+  night: {
+    bg: '#1c2230',
+    sea: '#0c1722',
+    seaEdge: '#3a6f8a',
+    mountains: '#2b3d2b',
+    mountainsEdge: '#4a6a48',
+    rivers: '#3a8ec0',
+    islandFill: '#262e3e',
+    islandEdge: '#3a6f8a',
+    ferry: '#5fb6c8',
+    prefBorder: '#5c4f3f',
+    districtOpacity: 0.28,
+  },
+};
+
+function applyMapTheme(m: MlMap, mode: 'day' | 'night') {
+  const p = PALETTES[mode];
+  const set = (
+    layer: string,
+    prop: string,
+    val: string | number,
+  ) => {
+    if (m.getLayer(layer))
+      (m.setPaintProperty as (a: string, b: string, c: unknown) => void)(layer, prop, val);
+  };
+  set('bg', 'background-color', p.bg);
+  set('sea', 'fill-color', p.sea);
+  set('sea', 'fill-outline-color', p.seaEdge);
+  set('sea-edge', 'line-color', p.seaEdge);
+  set('awaji-island', 'fill-color', p.islandFill);
+  set('awaji-island-edge', 'line-color', p.islandEdge);
+  set('mountains', 'fill-color', p.mountains);
+  set('mountains-edge', 'line-color', p.mountainsEdge);
+  set('rivers', 'line-color', p.rivers);
+  set('harbor-island', 'fill-color', p.islandFill);
+  set('harbor-island', 'fill-outline-color', p.islandEdge);
+  set('harbor-island-edge', 'line-color', p.islandEdge);
+  set('ferry-route', 'line-color', p.ferry);
+  set('pref-border', 'line-color', p.prefBorder);
+  set('district-fill', 'fill-opacity', p.districtOpacity);
+}
+
 const DAY_COLORS = [
   '#e63946',
   '#2a7da3',
@@ -673,6 +743,9 @@ onMounted(async () => {
       },
     });
 
+    // Apply current theme palette (day or night) to all map paint layers.
+    applyMapTheme(map, store.theme);
+
     // Initial visibility
     setVisibilityForZoom(map.getZoom());
     map.on('zoom', () => {
@@ -735,6 +808,14 @@ watch(
     const d = DISTRICTS.find((x) => x.id === id);
     if (!d) return;
     map.flyTo({ center: d.labelCoord, zoom: 11.5, speed: 0.9 });
+  },
+);
+
+// Re-apply theme palette whenever the user toggles day/night.
+watch(
+  () => store.theme,
+  (mode) => {
+    if (map) applyMapTheme(map, mode);
   },
 );
 
