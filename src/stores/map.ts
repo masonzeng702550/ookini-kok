@@ -6,6 +6,8 @@ import { RAILWAY_BY_ID } from '@/data/railways';
 import { STATIONS } from '@/data/stations';
 import type { CityId, DrawerTab, Itinerary, ZoomLevel } from '@/types';
 
+export type ThemeMode = 'day' | 'night';
+
 interface State {
   activeTab: DrawerTab;
   activeCityId: CityId | null;
@@ -20,9 +22,12 @@ interface State {
   selectedIds: string[];
   /** Attractions the user has favorited (heart-tapped). Persisted. */
   favoriteIds: string[];
+  /** Day or night palette for the map and UI. Persisted. */
+  theme: ThemeMode;
 }
 
 const FAV_KEY = 'okini-favorites';
+const THEME_KEY = 'okini-theme';
 
 function readFavorites(): string[] {
   if (typeof window === 'undefined') return [];
@@ -45,6 +50,21 @@ function writeFavorites(ids: string[]) {
   }
 }
 
+function readTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'day';
+  const v = window.localStorage.getItem(THEME_KEY);
+  return v === 'night' ? 'night' : 'day';
+}
+
+function writeTheme(t: ThemeMode) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(THEME_KEY, t);
+  } catch {
+    /* ignore */
+  }
+}
+
 export const useMapStore = defineStore('map', {
   state: (): State => ({
     activeTab: 'area',
@@ -58,6 +78,7 @@ export const useMapStore = defineStore('map', {
     itinerary: null,
     selectedIds: [],
     favoriteIds: readFavorites(),
+    theme: readTheme(),
   }),
   getters: {
     cities: () => CITIES,
@@ -154,6 +175,10 @@ export const useMapStore = defineStore('map', {
     },
     isFavorite(id: string): boolean {
       return this.favoriteIds.includes(id);
+    },
+    toggleTheme() {
+      this.theme = this.theme === 'day' ? 'night' : 'day';
+      writeTheme(this.theme);
     },
   },
 });
