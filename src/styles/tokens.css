@@ -49,3 +49,21 @@
   --rail-randen: #7db342;
   --rail-monorail: #0091a1;
 }
+
+/* Night mode — Dotonbori-after-dark palette. Applied when documentElement
+ * has the .night class (toggled by the Pinia store). Brand neons stay
+ * exactly the same so they pop against the deep navy surface. */
+:root.night {
+  --paper:       #1f263a;   /* deep slate navy as the base surface */
+  --paper-soft:  #2a3146;   /* slightly lighter for card backgrounds */
+  --paper-warm:  #353d56;   /* hover / elevated surface */
+  --sea:         #0c1722;
+  --sea-deep:    #0a131c;
+  --sea-glow:    #5fb6c8;
+  --sage:        #2d3a2b;
+  --sage-deep:   #4a6a48;
+  --ink:         #f3e6c8;   /* warm cream ink for readability */
+  --ink-soft:    #cdbfa3;
+  --ink-faint:   #8c8674;
+  --line:        #3e4661;
+}

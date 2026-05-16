@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watchEffect } from 'vue';
 import TopAppBar from '@/components/layout/TopAppBar.vue';
 import SideDrawer from '@/components/layout/SideDrawer.vue';
 import PlanFab from '@/components/layout/PlanFab.vue';
@@ -15,6 +15,14 @@ const store = useMapStore();
 const { isMobile, isDesktop } = useBreakpoint();
 
 applyShareHashOnLoad();
+
+// Reflect the current theme as a class on <html> so the night-mode token
+// overrides in tokens.css take effect across the whole UI.
+watchEffect(() => {
+  const root = document.documentElement;
+  if (store.theme === 'night') root.classList.add('night');
+  else root.classList.remove('night');
+});
 
 function selectCity(id: CityId) {
   store.selectCity(id);
