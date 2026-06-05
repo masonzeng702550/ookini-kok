@@ -26,6 +26,12 @@ const fareDisplay = computed(() =>
 const walkKmDisplay = computed(() =>
   (totals.value.walkMeters / 1000).toFixed(1),
 );
+// Urban-walking calorie rate ≈ 60 kcal/km for an average adult at 4.5 km/h.
+// Rounded to the nearest 10 so the number reads as an estimate not a claim.
+const caloriesDisplay = computed(() => {
+  const km = totals.value.walkMeters / 1000;
+  return Math.round((km * 60) / 10) * 10;
+});
 </script>
 
 <template>
@@ -62,6 +68,18 @@ const walkKmDisplay = computed(() =>
         <span class="material-symbols-outlined filled text-[18px] text-ink-soft">directions_walk</span>
         <span class="font-display text-xl font-extrabold text-ink leading-none">
           {{ walkKmDisplay }} km
+        </span>
+      </div>
+
+      <!-- Calorie estimate -->
+      <div class="px-3 py-2.5 flex items-center gap-2">
+        <span class="font-label text-[10px] tracking-widest text-ink-soft uppercase w-16">
+          預估消耗
+        </span>
+        <span class="flex-1" />
+        <span class="material-symbols-outlined filled text-[18px] text-orange-500">local_fire_department</span>
+        <span class="font-display text-xl font-extrabold text-ink leading-none">
+          ~{{ caloriesDisplay }} kcal
         </span>
       </div>
 
