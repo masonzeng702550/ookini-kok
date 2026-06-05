@@ -86,6 +86,26 @@ function segIcon(seg: CommuteSegment): string {
 }
 
 const itinerary = computed(() => store.itinerary);
+
+const tripTotals = computed(() => {
+  const it = itinerary.value;
+  if (!it) return { stopCount: 0, totalKm: '0', totalHours: '0' };
+  let stopCount = 0;
+  let walkMeters = 0;
+  let totalMinutes = 0;
+  for (const day of it.days) {
+    stopCount += day.stops.length;
+    totalMinutes += day.stayMinutes + day.commuteMinutes;
+    for (const stop of day.stops) {
+      if (stop.commute) walkMeters += stop.commute.totalWalkMeters ?? 0;
+    }
+  }
+  return {
+    stopCount,
+    totalKm: (walkMeters / 1000).toFixed(1),
+    totalHours: (totalMinutes / 60).toFixed(1),
+  };
+});
 </script>
 
 <template>
@@ -213,6 +233,44 @@ const itinerary = computed(() => store.itinerary);
         >
           清除
         </button>
+      </div>
+
+      <!-- Trip totals banner — at-a-glance overview before the detailed cards -->
+      <div
+        class="grid grid-cols-4 gap-1 rounded-xl border border-line bg-gradient-to-br from-neon-pink/8 to-neon-cyan/8 overflow-hidden"
+      >
+        <div class="px-2 py-2 text-center">
+          <div class="font-display text-lg font-extrabold text-ink leading-none">
+            {{ itinerary.days.length }}
+          </div>
+          <div class="font-label text-[9px] tracking-widest text-ink-soft uppercase mt-1">
+            天
+          </div>
+        </div>
+        <div class="px-2 py-2 text-center border-l border-line/60">
+          <div class="font-display text-lg font-extrabold text-ink leading-none">
+            {{ tripTotals.stopCount }}
+          </div>
+          <div class="font-label text-[9px] tracking-widest text-ink-soft uppercase mt-1">
+            景點
+          </div>
+        </div>
+        <div class="px-2 py-2 text-center border-l border-line/60">
+          <div class="font-display text-lg font-extrabold text-ink leading-none">
+            {{ tripTotals.totalKm }}<span class="text-xs">km</span>
+          </div>
+          <div class="font-label text-[9px] tracking-widest text-ink-soft uppercase mt-1">
+            步行
+          </div>
+        </div>
+        <div class="px-2 py-2 text-center border-l border-line/60">
+          <div class="font-display text-lg font-extrabold text-ink leading-none">
+            {{ tripTotals.totalHours }}<span class="text-xs">h</span>
+          </div>
+          <div class="font-label text-[9px] tracking-widest text-ink-soft uppercase mt-1">
+            預估
+          </div>
+        </div>
       </div>
 
       <!-- Cost / walking / pass summary -->
