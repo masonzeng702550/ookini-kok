@@ -4,6 +4,7 @@ import { useMapStore } from '@/stores/map';
 import { ATTRACTIONS, ATTRACTION_BY_ID } from '@/data/attractions';
 import { CITIES } from '@/data/cities';
 import { planItinerary, recommendItinerary } from '@/data/planner';
+import { commuteBetweenCached } from '@/data/commute';
 import { RAILWAY_BY_ID } from '@/data/railways';
 import PlanPrefsCard from './PlanPrefsCard.vue';
 import PlanSurpriseButton from './PlanSurpriseButton.vue';
@@ -61,6 +62,42 @@ function generateRecommend() {
 
 function clearPlan() {
   store.setItinerary(null);
+}
+
+/**
+ * Swap a stop with its neighbor within a day. Recomputes the chain of commute
+ * objects (each stop holds the commute FROM the previous stop TO itself) for
+ * the affected pairs and updates the day totals + the store so the map's
+ * route polyline re-renders too.
+ */
+function moveStop(dayIdx: number, stopIdx: number, delta: -1 | 1) {
+  const it = store.itinerary;
+  if (!it) return;
+  const day = it.days[dayIdx];
+  if (!day) return;
+  const newIdx = stopIdx + delta;
+  if (newIdx < 0 || newIdx >= day.stops.length) return;
+
+  const stops = day.stops.slice();
+  [stops[stopIdx], stops[newIdx]] = [stops[newIdx], stops[stopIdx]];
+
+  // Rebuild commute + totals
+  let stayMinutes = 0;
+  let commuteMinutes = 0;
+  const rebuilt = stops.map((s, i) => {
+    const stay = ATTRACTION_BY_ID[s.attractionId]?.duration ?? s.stayMinutes;
+    stayMinutes += stay;
+    if (i === 0) return { ...s, stayMinutes: stay, commute: undefined };
+    const from = ATTRACTION_BY_ID[stops[i - 1].attractionId];
+    const to = ATTRACTION_BY_ID[s.attractionId];
+    const commute = from && to ? commuteBetweenCached(from, to) : undefined;
+    commuteMinutes += commute?.totalMinutes ?? 0;
+    return { ...s, stayMinutes: stay, commute };
+  });
+
+  const newDays = it.days.slice();
+  newDays[dayIdx] = { ...day, stops: rebuilt, stayMinutes, commuteMinutes };
+  store.setItinerary({ ...it, days: newDays });
 }
 
 function formatMinutes(m: number): string {
@@ -318,30 +355,51 @@ const tripTotals = computed(() => {
               </div>
             </div>
 
-            <!-- The stop itself -->
-            <button
-              class="flex items-start gap-2 text-left w-full hover:opacity-80"
-              @click="store.selectAttraction(stop.attractionId)"
-            >
-              <span
-                class="material-symbols-outlined filled mt-0.5 text-[18px]"
-                :style="`color: ${
-                  ATTRACTION_BY_ID[stop.attractionId]?.cityId === 'kyoto' ? '#b7295a' :
-                  ATTRACTION_BY_ID[stop.attractionId]?.cityId === 'kobe' ? '#2a7da3' :
-                  ATTRACTION_BY_ID[stop.attractionId]?.cityId === 'nara' ? '#6fbe3f' :
-                  ATTRACTION_BY_ID[stop.attractionId]?.cityId === 'kix' ? '#ff7a00' :
-                  '#e63946'
-                };`"
-              >{{ ATTRACTION_BY_ID[stop.attractionId]?.iconSymbol }}</span>
-              <span class="flex-1">
-                <div class="font-bold text-sm text-ink leading-tight">
-                  {{ ATTRACTION_BY_ID[stop.attractionId]?.name_zh }}
-                </div>
-                <div class="text-[11px] text-ink-soft">
-                  停留 {{ formatMinutes(stop.stayMinutes) }}
-                </div>
-              </span>
-            </button>
+            <!-- The stop itself + reorder controls -->
+            <div class="flex items-start gap-2">
+              <button
+                class="flex items-start gap-2 text-left flex-1 hover:opacity-80"
+                @click="store.selectAttraction(stop.attractionId)"
+              >
+                <span
+                  class="material-symbols-outlined filled mt-0.5 text-[18px]"
+                  :style="`color: ${
+                    ATTRACTION_BY_ID[stop.attractionId]?.cityId === 'kyoto' ? '#b7295a' :
+                    ATTRACTION_BY_ID[stop.attractionId]?.cityId === 'kobe' ? '#2a7da3' :
+                    ATTRACTION_BY_ID[stop.attractionId]?.cityId === 'nara' ? '#6fbe3f' :
+                    ATTRACTION_BY_ID[stop.attractionId]?.cityId === 'kix' ? '#ff7a00' :
+                    '#e63946'
+                  };`"
+                >{{ ATTRACTION_BY_ID[stop.attractionId]?.iconSymbol }}</span>
+                <span class="flex-1">
+                  <div class="font-bold text-sm text-ink leading-tight">
+                    {{ ATTRACTION_BY_ID[stop.attractionId]?.name_zh }}
+                  </div>
+                  <div class="text-[11px] text-ink-soft">
+                    停留 {{ formatMinutes(stop.stayMinutes) }}
+                  </div>
+                </span>
+              </button>
+
+              <div class="flex flex-col gap-0.5 opacity-60 hover:opacity-100 transition-opacity">
+                <button
+                  class="w-6 h-5 rounded grid place-items-center text-ink-soft hover:bg-paper-soft hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed"
+                  :disabled="idx === 0"
+                  aria-label="上移"
+                  @click="moveStop(day.dayIndex, idx, -1)"
+                >
+                  <span class="material-symbols-outlined text-[16px]">arrow_drop_up</span>
+                </button>
+                <button
+                  class="w-6 h-5 rounded grid place-items-center text-ink-soft hover:bg-paper-soft hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed"
+                  :disabled="idx === day.stops.length - 1"
+                  aria-label="下移"
+                  @click="moveStop(day.dayIndex, idx, 1)"
+                >
+                  <span class="material-symbols-outlined text-[16px]">arrow_drop_down</span>
+                </button>
+              </div>
+            </div>
           </li>
         </ol>
       </div>
