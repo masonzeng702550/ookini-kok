@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { AttractionTag, PlannerPrefs } from '@/types';
+import type { AttractionTag, PlannerPrefs, Season } from '@/types';
 
 const props = defineProps<{
   modelValue: PlannerPrefs;
@@ -16,6 +16,14 @@ const THEMES: { id: NonNullable<PlannerPrefs['theme']>; label: string }[] = [
   { id: 'temple', label: '寺廟神社' },
   { id: 'family', label: '親子' },
   { id: 'photo', label: '攝影' },
+];
+
+const SEASONS: { id: Season; label: string }[] = [
+  { id: 'any', label: '不限' },
+  { id: 'spring', label: '🌸 春' },
+  { id: 'summer', label: '⛩ 夏' },
+  { id: 'autumn', label: '🍁 秋' },
+  { id: 'winter', label: '❄ 冬' },
 ];
 
 const ALL_TAGS: { id: AttractionTag; label: string }[] = [
@@ -64,6 +72,14 @@ function isThemeActive(t: NonNullable<PlannerPrefs['theme']>): boolean {
 function isExcluded(tag: AttractionTag): boolean {
   return (prefs.value.excludedTags ?? []).includes(tag);
 }
+
+function isSeasonActive(s: Season): boolean {
+  return (prefs.value.season ?? 'any') === s;
+}
+
+function setSeason(s: Season) {
+  update({ season: s });
+}
 </script>
 
 <template>
@@ -96,6 +112,29 @@ function isExcluded(tag: AttractionTag): boolean {
           @click="setTheme(t.id)"
         >
           {{ t.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Season -->
+    <div>
+      <label class="font-label text-[10px] tracking-widest text-ink-soft uppercase">
+        季節
+      </label>
+      <div class="flex flex-wrap gap-1.5 mt-1.5">
+        <button
+          v-for="s in SEASONS"
+          :key="s.id"
+          type="button"
+          class="px-2.5 py-1 rounded-full text-xs font-bold border transition"
+          :class="
+            isSeasonActive(s.id)
+              ? 'bg-neon-pink/15 border-neon-pink text-ink'
+              : 'bg-white border-line text-ink-soft hover:bg-paper'
+          "
+          @click="setSeason(s.id)"
+        >
+          {{ s.label }}
         </button>
       </div>
     </div>

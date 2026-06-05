@@ -219,6 +219,37 @@ export function planItinerary(
   };
 }
 
+// Attractions famous for a particular season — boosted when the matching
+// season is selected in PlannerPrefs.season. Curated list; not exhaustive.
+const SEASONAL_BOOST: Record<string, NonNullable<PlannerPrefs['season']>[]> = {
+  // Sakura (late March - mid April)
+  'daigoji': ['spring'],
+  'yoshinoyama': ['spring'],
+  'osaka-mint': ['spring'],
+  'philosophers-path': ['spring'],
+  'nara-park': ['spring', 'autumn'],
+  'arashiyama-bamboo': ['spring', 'autumn'],
+  'kinkakuji': ['spring', 'winter'],
+  // Autumn foliage (November)
+  'eikando': ['autumn'],
+  'tofukuji': ['autumn'],
+  'kiyomizu-dera': ['autumn'],
+  'sanzenin': ['autumn'],
+  'tenryuji': ['autumn'],
+  'nanzenji': ['autumn'],
+  // Summer (matsuri / cool retreats / waterfalls)
+  'kifune-jinja': ['summer'],
+  'nunobiki-falls': ['summer'],
+  'kurama': ['summer'],
+  'hozugawa-kudari': ['summer'],
+  'suma-beach': ['summer'],
+  // Winter (onsen, snow, illuminations)
+  'arima-onsen': ['winter'],
+  'kobe-port-tower': ['winter'],
+  'umeda-sky': ['winter'],
+  'kobe-airport-attr': ['winter'],
+};
+
 // ─── Recommendation: pick best attractions for region + days ────────────
 function attractionScore(a: Attraction, prefs?: PlannerPrefs): number {
   let s = 1;
@@ -234,6 +265,10 @@ function attractionScore(a: Attraction, prefs?: PlannerPrefs): number {
     if (a.tags?.includes('family')) s += 3;
   } else if (theme === 'photo') {
     if (a.tags?.includes('photogenic')) s += 3;
+  }
+  const season = prefs?.season;
+  if (season && season !== 'any' && SEASONAL_BOOST[a.id]?.includes(season)) {
+    s += 3;
   }
   return s;
 }

@@ -26,7 +26,11 @@ export interface District {
 
 export type AttractionTag = 'top-rated' | 'spicy' | 'open-now' | 'family' | 'photogenic';
 
+export type Season = 'any' | 'spring' | 'summer' | 'autumn' | 'winter';
+
 export interface PlannerPrefs {
+  /** Boost attractions famous for this season (sakura, autumn foliage, etc.). */
+  season?: Season;
   excludedTags?: AttractionTag[];          // skip attractions with these tags
   maxWalkKm?: number;                       // soft cap per-day walking (km)
   startTime?: string;                       // 'HH:MM', display only
