@@ -42,3 +42,15 @@ body {
 }
 .maplibregl-ctrl-attrib a { color: rgba(255, 0, 122, 0.85) !important; }
 .maplibregl-canvas { outline: none; }
+
+/* Prefecture/府縣 labels — cream halo in day mode keeps them readable on
+   the warm paper background. In night mode the halo reads as fog over the
+   dark Dotonbori palette, so drop it and switch to a soft cream ink. */
+.pref-label__text {
+  color: rgba(168, 150, 131, 0.55);
+  text-shadow: 0 0 6px rgba(250, 243, 227, 0.9);
+}
+.night .pref-label__text {
+  color: rgba(245, 226, 207, 0.62);
+  text-shadow: none;
+}

@@ -344,19 +344,19 @@ function makePrefLabelEl(name: string, rome: string): HTMLElement {
   const wrap = document.createElement('div');
   wrap.className = 'pref-label';
   wrap.style.pointerEvents = 'none';
+  // Color + text-shadow live in main.css so the night theme can drop the
+  // cream halo (which looks like mist on the dark map background).
   wrap.innerHTML = `
-    <div style="
+    <div class="pref-label__text" style="
       text-align: center;
       font-family: Epilogue, system-ui, sans-serif;
       font-weight: 800;
       letter-spacing: 0.18em;
-      color: rgba(168, 150, 131, 0.55);
-      text-shadow: 0 0 6px rgba(250, 243, 227, 0.9);
       user-select: none;
       white-space: nowrap;
     ">
       <div style="font-size: 18px;">${name}</div>
-      <div style="
+      <div class="pref-label__rome" style="
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 700;
         font-size: 9px;
