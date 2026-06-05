@@ -26,31 +26,69 @@ function toggle() {
 
 const dialogClass = computed(() =>
   isMobile.value
-    ? 'fixed left-3 right-3 bottom-20 max-h-[70vh] rounded-2xl'
+    ? 'fixed left-0 right-0 bottom-0 max-h-[88vh] rounded-t-3xl'
     : 'fixed right-5 bottom-24 w-[380px] max-h-[78vh] rounded-2xl',
 );
+
+const transitionEnterFromClass = computed(() =>
+  isMobile.value
+    ? 'opacity-0 translate-y-full'
+    : 'opacity-0 translate-y-3 scale-95',
+);
+const transitionEnterToClass = computed(() =>
+  isMobile.value
+    ? 'opacity-100 translate-y-0'
+    : 'opacity-100 translate-y-0 scale-100',
+);
+const transitionLeaveFromClass = transitionEnterToClass;
+const transitionLeaveToClass = transitionEnterFromClass;
 </script>
 
 <template>
-  <!-- Floating panel (chat-style) -->
+  <!-- Backdrop (mobile only) so the sheet feels modal -->
   <transition
-    enter-active-class="transition duration-200 ease-out"
-    enter-from-class="opacity-0 translate-y-3 scale-95"
-    enter-to-class="opacity-100 translate-y-0 scale-100"
-    leave-active-class="transition duration-150 ease-in"
-    leave-from-class="opacity-100 translate-y-0 scale-100"
-    leave-to-class="opacity-0 translate-y-3 scale-95"
+    enter-active-class="transition-opacity duration-200 ease-out"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition-opacity duration-150 ease-in"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div
+      v-if="open && isMobile"
+      class="fixed inset-0 z-40 bg-ink/40 backdrop-blur-[1px]"
+      aria-hidden="true"
+      @click="open = false"
+    />
+  </transition>
+
+  <!-- Floating panel (chat-style on desktop, bottom sheet on mobile) -->
+  <transition
+    enter-active-class="transition duration-250 ease-out"
+    :enter-from-class="transitionEnterFromClass"
+    :enter-to-class="transitionEnterToClass"
+    leave-active-class="transition duration-200 ease-in"
+    :leave-from-class="transitionLeaveFromClass"
+    :leave-to-class="transitionLeaveToClass"
   >
     <section
       v-if="open"
       :class="['z-50 paper-panel-strong flex flex-col overflow-hidden', dialogClass]"
-      style="
-        box-shadow: 0 20px 50px -10px rgba(58,47,36,0.35),
-                    0 8px 16px rgba(122,92,56,0.18);
-        border: 1px solid var(--line);
-        transform-origin: bottom right;
+      :style="
+        isMobile
+          ? 'box-shadow: 0 -20px 50px -10px rgba(58,47,36,0.45); border-top: 1px solid var(--line);'
+          : 'box-shadow: 0 20px 50px -10px rgba(58,47,36,0.35), 0 8px 16px rgba(122,92,56,0.18); border: 1px solid var(--line); transform-origin: bottom right;'
       "
     >
+      <!-- Drag handle (mobile only) -->
+      <button
+        v-if="isMobile"
+        class="h-6 w-full flex items-center justify-center -mb-1"
+        aria-label="關閉行程規劃"
+        @click="open = false"
+      >
+        <span class="w-10 h-1.5 bg-line rounded-full" />
+      </button>
       <header
         class="flex items-center justify-between px-4 py-2.5 border-b border-line"
         style="background: linear-gradient(135deg, #ff007a 0%, #ff4b8a 100%);"
