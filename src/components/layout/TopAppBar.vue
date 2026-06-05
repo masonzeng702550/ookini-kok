@@ -53,6 +53,27 @@ const isActive = (id: CityId) => computed(() => store.activeCityId === id);
           {{ c.name_en }}
         </button>
       </nav>
+
+      <!-- Mobile-only horizontal-scroll pill row, fills the gap between title
+           and the right-side icon buttons so cities are one tap away. -->
+      <nav
+        class="md:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar -mr-1 pl-1"
+        style="scrollbar-width: none;"
+      >
+        <button
+          v-for="c in cities"
+          :key="c.id"
+          class="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide border transition-colors"
+          :class="
+            isActive(c.id).value
+              ? 'bg-neon-pink text-white border-neon-pink'
+              : 'bg-paper-soft text-ink-soft border-line'
+          "
+          @click="$emit('select-city', c.id)"
+        >
+          {{ c.name_en }}
+        </button>
+      </nav>
     </div>
 
     <div class="flex items-center gap-2 sm:gap-3">

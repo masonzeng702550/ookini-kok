@@ -30,6 +30,10 @@ body {
   background: rgba(255, 0, 122, 0.4);
 }
 
+/* Used by horizontal pill rows where the scrollbar adds visual noise */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
 /* MapLibre attribution — match paper theme */
 .maplibregl-ctrl-attrib {
   background: rgba(255, 251, 240, 0.85) !important;
