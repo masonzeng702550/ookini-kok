@@ -10,10 +10,16 @@ defineEmits<{ click: [id: string] }>();
 
 const store = useMapStore();
 const isFavorite = computed(() => store.favoriteIds.includes(props.attraction.id));
+const isInPlan = computed(() => store.selectedIds.includes(props.attraction.id));
 
 function toggleFavorite(ev: MouseEvent) {
   ev.stopPropagation();
   store.toggleFavorite(props.attraction.id);
+}
+
+function togglePlan(ev: MouseEvent) {
+  ev.stopPropagation();
+  store.toggleSelected(props.attraction.id);
 }
 </script>
 
@@ -89,6 +95,25 @@ function toggleFavorite(ev: MouseEvent) {
             {{ attraction.nearestStation }}
           </span>
         </div>
+
+        <!-- Add-to-plan toggle: quick way to build a manual itinerary while
+             browsing attractions. Toggles store.selectedIds. -->
+        <span
+          role="button"
+          class="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold border transition cursor-pointer"
+          :class="
+            isInPlan
+              ? 'bg-neon-pink text-white border-neon-pink'
+              : 'bg-white border-line text-ink-soft hover:border-neon-pink/60 hover:text-neon-pink'
+          "
+          :aria-label="isInPlan ? '從行程移除' : '加入行程'"
+          @click="togglePlan($event)"
+        >
+          <span class="material-symbols-outlined text-[14px]" :class="isInPlan ? 'filled' : ''">
+            {{ isInPlan ? 'check_circle' : 'add_circle' }}
+          </span>
+          {{ isInPlan ? '已加入行程' : '加入行程' }}
+        </span>
       </div>
     </div>
   </button>
