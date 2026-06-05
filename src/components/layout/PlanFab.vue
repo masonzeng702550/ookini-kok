@@ -119,10 +119,14 @@ const transitionLeaveToClass = transitionEnterFromClass;
     </section>
   </transition>
 
-  <!-- Floating action button -->
+  <!-- Floating action button — compact icon-only on mobile to clear the
+       bottom drawer handle and not cover the map. Pill with label on desktop. -->
   <button
-    class="fixed right-5 bottom-5 z-50 group"
-    :class="open ? 'pointer-events-none opacity-0 scale-90' : 'opacity-100 scale-100'"
+    class="fixed z-50 group"
+    :class="[
+      isMobile ? 'right-3 bottom-[5.5rem]' : 'right-5 bottom-5',
+      open ? 'pointer-events-none opacity-0 scale-90' : 'opacity-100 scale-100',
+    ]"
     style="transition: opacity 180ms ease, transform 180ms ease;"
     aria-label="開啟行程規劃"
     @click="toggle"
@@ -133,15 +137,23 @@ const transitionLeaveToClass = transitionEnterFromClass;
       style="background: rgba(255, 0, 122, 0.4);"
     ></span>
     <span
-      class="relative flex items-center gap-2 pl-3.5 pr-4 py-3 rounded-full text-white font-bold shadow-xl transition-transform group-hover:scale-105"
+      class="relative flex items-center justify-center text-white font-bold shadow-xl transition-transform group-hover:scale-105"
+      :class="
+        isMobile
+          ? 'rounded-full w-12 h-12'
+          : 'rounded-full gap-2 pl-3.5 pr-4 py-3'
+      "
       style="
         background: linear-gradient(135deg, #ff007a 0%, #ff4b8a 100%);
         box-shadow: 0 10px 30px -6px rgba(255,0,122,0.55),
                     0 4px 10px rgba(58,47,36,0.25);
       "
     >
-      <span class="material-symbols-outlined filled text-[22px]">route</span>
-      <span class="text-sm tracking-wide">規劃行程</span>
+      <span
+        class="material-symbols-outlined filled"
+        :class="isMobile ? 'text-[26px]' : 'text-[22px]'"
+      >route</span>
+      <span v-if="!isMobile" class="text-sm tracking-wide">規劃行程</span>
     </span>
   </button>
 </template>
