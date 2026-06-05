@@ -23,9 +23,11 @@ const tabs: { id: DrawerTab; label: string; icon: string }[] = [
 const drawerClass = computed(() =>
   isMobile.value
     ? [
-        'fixed left-0 right-0 bottom-0 z-40 max-h-[72vh] rounded-t-2xl',
-        'transform transition-transform duration-300',
-        store.drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-3.5rem)]',
+        'fixed left-0 right-0 bottom-0 z-40 max-h-[80vh] rounded-t-3xl',
+        // Snappier ease; collapsed reveals handle + tab bar (~4.5rem) so
+        // users can tap a tab without dragging the sheet open first.
+        'transform transition-transform duration-300 ease-[cubic-bezier(.32,.72,0,1)]',
+        store.drawerOpen ? 'translate-y-0' : 'translate-y-[calc(100%-4.75rem)]',
       ]
     : [
         'fixed top-16 left-0 bottom-0 z-40 w-80',
@@ -33,6 +35,13 @@ const drawerClass = computed(() =>
         store.drawerOpen ? 'translate-x-0' : '-translate-x-full',
       ],
 );
+
+function tapTab(id: DrawerTab) {
+  // On mobile a tab tap should also expand the sheet if it's collapsed —
+  // peeking at the tab bar and tapping should never need a separate drag.
+  if (isMobile.value && !store.drawerOpen) store.toggleDrawer(true);
+  store.setTab(id);
+}
 </script>
 
 <template>
@@ -46,10 +55,14 @@ const drawerClass = computed(() =>
   >
     <button
       v-if="isMobile"
-      class="h-10 w-full flex items-center justify-center"
+      class="h-7 w-full flex items-center justify-center -mb-1 group/handle"
+      :aria-label="store.drawerOpen ? '收合' : '展開'"
       @click="store.toggleDrawer()"
     >
-      <span class="w-12 h-1.5 bg-line rounded-full"></span>
+      <span
+        class="h-1.5 rounded-full bg-line transition-all"
+        :class="store.drawerOpen ? 'w-12' : 'w-16 bg-neon-pink/60'"
+      ></span>
     </button>
 
     <!-- Tab bar -->
@@ -63,7 +76,7 @@ const drawerClass = computed(() =>
             ? 'text-neon-pink bg-neon-pink/10'
             : 'text-ink-soft hover:bg-paper-soft hover:text-ink'
         "
-        @click="store.setTab(t.id)"
+        @click="tapTab(t.id)"
       >
         <span
           class="material-symbols-outlined text-[22px]"
